@@ -3,8 +3,8 @@ set cpo&vim
 
 
 " vital.vim
-let s:V = vital#of('vital')
-let s:File     = s:V.import('System.File')
+let s:V    = vital#of('vital')
+let s:File = s:V.import('System.File')
 
 let s:callbacks = w#callbacks#new()
 
@@ -17,7 +17,9 @@ function! w#memo#create() "{{{
   let filepath = memo_dir . g:w#settings.filename()
   call w#memo#open(filepath)
 
-  call s:callbacks.notify('after_create')
+  let context = {}
+  let context.filepath = filepath
+  call s:callbacks.notify('after_create', context)
 
 endfunction "}}}
 

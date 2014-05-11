@@ -13,6 +13,9 @@ let s:sample_b = {'name': 'sample_b'}
 function! s:sample_a.callbacks.memo.before_create(...) "{{{
   echo 'What dou you write?'
 endfunction "}}}
+function! s:sample_a.callbacks.memo.after_create(...) "{{{
+  echo a:000
+endfunction "}}}
 
 function! w#features#sample#load() "{{{
   return [

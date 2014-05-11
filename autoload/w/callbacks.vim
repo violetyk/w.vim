@@ -6,7 +6,7 @@ function! w#callbacks#new()
   let self._callbacks = {}
 
   function! self.initialize() "{{{
-    unlet! self._callbacks
+    unlet self._callbacks
     let self._callbacks = {}
   endfunction "}}}
   function! self.add(name, listener) "{{{
