@@ -4,7 +4,7 @@ set cpo&vim
 let s:features = []
 
 function! w#feature#load_all() "{{{
-  unlet s:features
+  unlet! s:features
   let s:features = []
 
   let files = split(globpath(&rtp, 'autoload/w/features/*.vim'), '\n')
