@@ -2,6 +2,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 let s:features = []
+let s:callbacks = w#callbacks#new()
 
 function! w#feature#load_all() "{{{
   unlet! s:features
@@ -29,10 +30,16 @@ function! w#feature#load_all() "{{{
     endfor
 
   endfor
+
+  call s:callbacks.notify('after_load')
 endfunction "}}}
 
 function! w#feature#list() "{{{
  echo s:features
+endfunction "}}}
+
+function! w#feature#add_callback(name, listener) "{{{
+  return s:callbacks.add(a:name, a:listener)
 endfunction "}}}
 
 let &cpo = s:save_cpo

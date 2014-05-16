@@ -9,6 +9,11 @@ set cpo&vim
 
 
 let g:w#settings = w#settings#default()
+call w#feature#load_all()
+
+" autocmd
+
+
 
 command! Wopen call w#sidebar#open('mysidebar', 'left', 30)
 command! Wclose call w#sidebar#close('mysidebar')
