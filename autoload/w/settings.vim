@@ -14,12 +14,16 @@ function! w#settings#default() "{{{
   function! self.memo_dir() " {{{
     return $HOME . '/.vim_w/memo/'
   endfunction " }}}
+  function! self.memo_extension() "{{{
+    return '.txt'
+  endfunction "}}}
   function! self.filename() "{{{
     let d = s:DateTime.now()
-    return printf('%s%s_%s.txt',
+    return printf('%s%s_%s%s',
           \ d.format('%Y%m%d%H%M%S'),
           \ abs(s:Random.rand()),
-          \ hostname()
+          \ hostname(),
+          \ self.memo_extension()
           \ )
   endfunction "}}}
 

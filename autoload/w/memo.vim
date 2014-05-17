@@ -6,11 +6,9 @@ set cpo&vim
 let s:V    = vital#of('vital')
 let s:File = s:V.import('System.File')
 
-let s:callbacks = w#callbacks#new()
-
 function! w#memo#create() "{{{
 
-  call s:callbacks.notify('before_create')
+  call g:w#event_manager.notify('memo_before_create')
 
   let memo_dir = g:w#settings.memo_dir()
   call s:File.mkdir_nothrow(memo_dir, 'p')
@@ -19,7 +17,7 @@ function! w#memo#create() "{{{
 
   let context = {}
   let context.filepath = filepath
-  call s:callbacks.notify('after_create', context)
+  call g:w#event_manager.notify('memo_after_create', context)
 
 endfunction "}}}
 
@@ -54,10 +52,11 @@ function! w#memo#open(path, ...) " {{{
   endif
 endfunction "}}}
 
-function! w#memo#add_callback(name, listener) "{{{
-  return s:callbacks.add(a:name, a:listener)
+function! w#memo#write(filepath) "{{{
+  let context = {}
+  let context.filepath = a:filepath
+  call g:w#event_manager.notify('memo_after_write', context)
 endfunction "}}}
-
 
 let &cpo = s:save_cpo
 unlet s:save_cpo

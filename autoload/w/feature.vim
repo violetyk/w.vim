@@ -1,12 +1,8 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:features = []
-let s:callbacks = w#callbacks#new()
 
-function! w#feature#load_all() "{{{
-  unlet! s:features
-  let s:features = []
+function! w#feature#load_all(disable_features, event_manager) "{{{
 
   let files = split(globpath(&rtp, 'autoload/w/features/*.vim'), '\n')
 
@@ -20,27 +16,20 @@ function! w#feature#load_all() "{{{
     endif
 
     for f in a
-      if has_key(f, 'callbacks')
-        for [target, context] in items(f.callbacks)
-          let [name, Fn] = items(context)[0]
-          let listener = [Fn, f.callbacks[target]]
-          call call(printf("w#%s#add_callback", target), [name, listener])
+      if index(a:disable_features, f.name) != -1
+        continue
+      endif
+      if has_key(f, 'events')
+        for [name, Listener] in items(f.events)
+          call a:event_manager.add(name, Listener)
         endfor
       endif
     endfor
 
   endfor
 
-  call s:callbacks.notify('after_load')
 endfunction "}}}
 
-function! w#feature#list() "{{{
- echo s:features
-endfunction "}}}
-
-function! w#feature#add_callback(name, listener) "{{{
-  return s:callbacks.add(a:name, a:listener)
-endfunction "}}}
 
 let &cpo = s:save_cpo
 unlet s:save_cpo

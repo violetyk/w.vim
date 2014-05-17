@@ -1,30 +1,27 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:sample_a = {
-      \ 'name': 'sample_a',
-      \ 'callbacks': {
-      \   'feature': {},
-      \   'memo': {},
-      \ }
+let s:feature = {
+      \ 'name': 'sample',
+      \ 'events': {},
       \}
 
-let s:sample_b = {'name': 'sample_b'}
-
-function! s:sample_a.callbacks.feature.after_load(...) "{{{
-  echo 'loaded sample feature.'
+function! s:feature.events.bootstrap(...) "{{{
+  echo 'Loaded ' . s:feature.name
 endfunction "}}}
-function! s:sample_a.callbacks.memo.before_create(...) "{{{
+function! s:feature.events.memo_before_create(...) "{{{
   echo 'What do you write?'
 endfunction "}}}
-function! s:sample_a.callbacks.memo.after_create(...) "{{{
-  echo a:000
+function! s:feature.events.memo_after_create(...) "{{{
+  echo "Please don't forget to save!"
+endfunction "}}}
+function! s:feature.events.memo_after_write(...) "{{{
+  echo "Write! " . a:1.filepath
 endfunction "}}}
 
 function! w#features#sample#load() "{{{
   return [
-        \ s:sample_a,
-        \ s:sample_b
+        \ s:feature,
         \ ]
 endfunction "}}}
 
