@@ -15,27 +15,28 @@ let g:w#event_manager = w#events#new()
 
 " enable plugin feature
 if !exists('g:w#disable_features')
-  " let g:w#disable_features = ['sample']
-  let g:w#disable_features = []
+  let g:w#disable_features = ['sample']
 endif
 call w#feature#load_all(g:w#disable_features, g:w#event_manager)
 
 " bootstrap
-call g:w#event_manager.notify('bootstrap')
+if w#bootstrap()
+  " register auto commands
+  augroup w_vim_memo
+    autocmd!
+    autocmd BufWritePost *.txt 
+          \ let dir = finddir(g:w#settings.memo_dir(), escape(expand("%:p:h"), ' \') . ';') |
+          \ if isdirectory(dir) | call w#memo#write(expand("%:p")) | endif
+  augroup END
 
-" register auto commands
-augroup w_vim_memo
-  autocmd!
-  autocmd BufWritePost *.txt 
-        \ let dir = finddir(g:w#settings.memo_dir(), escape(expand("%:p:h"), ' \') . ';') |
-        \ if isdirectory(dir) | call w#memo#write(expand("%:p")) | endif
-augroup END
+
+  command! Wopen call w#sidebar#open('mysidebar', 'left', 30)
+  command! Wclose call w#sidebar#close('mysidebar')
+  command! Wtoggle call w#sidebar#toggle('mysidebar')
+  command! Wnew  call w#memo#create()
+endif
 
 
-command! Wopen call w#sidebar#open('mysidebar', 'left', 30)
-command! Wclose call w#sidebar#close('mysidebar')
-command! Wtoggle call w#sidebar#toggle('mysidebar')
-command! Wnew  call w#memo#create()
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
