@@ -9,14 +9,15 @@ function! w#events#new()
     unlet! self._events
     let self._events = {}
   endfunction "}}}
+
   function! self.add(name, listener) "{{{
     if !has_key(self._events, a:name)
       let self._events[a:name] = []
     endif
     return add(self._events[a:name], a:listener)
   endfunction "}}}
-  function! self.notify(name, ...) "{{{
 
+  function! self.notify(name, ...) "{{{
     if !has_key(self._events, a:name)
       return
     endif

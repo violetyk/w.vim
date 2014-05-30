@@ -3,11 +3,10 @@ set cpo&vim
 
 
 " vital.vim
-let s:V    = vital#of('vital')
+let s:V    = vital#of(g:w_of_vital)
 let s:File = s:V.import('System.File')
 
 function! w#memo#create() "{{{
-
   call g:w#event_manager.notify('memo_before_create')
 
   let memo_dir = g:w#settings.memo_dir()
@@ -18,7 +17,6 @@ function! w#memo#create() "{{{
   let context = {}
   let context.filepath = filepath
   call g:w#event_manager.notify('memo_after_create', context)
-
 endfunction "}}}
 
 function! w#memo#open(path, ...) " {{{
@@ -53,6 +51,17 @@ function! w#memo#open(path, ...) " {{{
 endfunction "}}}
 
 function! w#memo#write(filepath) "{{{
+
+  try
+    let parser = g:w#settings.parser(a:filepath)
+    let title = parser.get_title()
+    let tags  = parser.get_tags()
+
+  catch
+    return 0
+  endtry
+
+  "title, tags
   let context = {}
   let context.filepath = a:filepath
   call g:w#event_manager.notify('memo_after_write', context)

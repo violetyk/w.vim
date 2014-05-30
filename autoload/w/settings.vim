@@ -3,20 +3,21 @@ set cpo&vim
 
 
 " vital.vim
-let s:V        = vital#of('vital')
+let s:V        = vital#of(g:w_of_vital)
 let s:DateTime = s:V.import('DateTime')
 let s:Random   = s:V.import('Random.Xor128')
 
-function! w#settings#default() "{{{
-
+function! w#settings#default()
   let self = {}
 
   function! self.memo_dir() " {{{
     return $HOME . '/.vim_w/memo/'
   endfunction " }}}
+
   function! self.memo_extension() "{{{
     return '.txt'
   endfunction "}}}
+
   function! self.filename() "{{{
     let d = s:DateTime.now()
     return printf('%s%s_%s%s',
@@ -27,8 +28,12 @@ function! w#settings#default() "{{{
           \ )
   endfunction "}}}
 
+  function! self.parser(filepath) "{{{
+    return w#parser#new(a:filepath)
+  endfunction "}}}
+
   return self
-endfunction "}}}
+endfunction
 
 
 let &cpo = s:save_cpo

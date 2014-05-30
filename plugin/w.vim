@@ -6,18 +6,19 @@ let g:loaded_w_vim = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
+" global variables
+" let g:w_disable_features = get(g:, 'w_disable_features', ['sample'])
+let g:w_disable_features = []
+let g:w_of_vital         = get(g:, 'w_of_vital', 'vital')
 
 " default settings
-let g:w#settings  = w#settings#default()
+let g:w#settings = w#settings#default()
 
 " event manager
 let g:w#event_manager = w#events#new()
 
 " enable plugin feature
-if !exists('g:w#disable_features')
-  let g:w#disable_features = ['sample']
-endif
-call w#feature#load_all(g:w#disable_features, g:w#event_manager)
+call w#feature#load_all(g:w_disable_features, g:w#event_manager)
 
 " bootstrap
 if w#bootstrap()

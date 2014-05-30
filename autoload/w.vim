@@ -3,18 +3,18 @@ set cpo&vim
 
 
 " vital.vim
-let s:V       = vital#of('vital')
+let s:V       = vital#of(g:w_of_vital)
 let s:Message = s:V.import('Vim.Message')
-let s:DB      = s:V.import('Database.SQLite')
 
 let g:w#version  = 1
 
 function! w#bootstrap() "{{{
-
-  if !s:DB.is_available()
-    call s:Message.error('[w.vim] sqlite3 is not executable.')
+  echo 'uho'
+  if !w#database#startup()
     return 0
   endif
+  echo 'uho'
+  echo 'uho'
 
   " let r =  s:DB.query('vim_w', 'select name from sqlite_master')
   " let r =  s:DB.query('vim_w', 'insert into meta values(3, "hogepiyo");')
