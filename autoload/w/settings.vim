@@ -32,6 +32,14 @@ function! w#settings#default()
     return w#parser#new(a:filepath)
   endfunction "}}}
 
+  function! self.database_dir() " {{{
+    return $HOME . '/.vim_w/'
+  endfunction " }}}
+
+  function! self.database_file() " {{{
+    return 'w.sqlite'
+  endfunction " }}}
+
   return self
 endfunction
 

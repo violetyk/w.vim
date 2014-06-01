@@ -51,20 +51,17 @@ function! w#memo#open(path, ...) " {{{
 endfunction "}}}
 
 function! w#memo#write(filepath) "{{{
+  let parser = g:w#settings.parser(a:filepath)
+  let title = parser.get_title()
+  let tags  = parser.get_tags()
 
-  try
-    let parser = g:w#settings.parser(a:filepath)
-    let title = parser.get_title()
-    let tags  = parser.get_tags()
-
-  catch
-    return 0
-  endtry
-
-  "title, tags
-  let context = {}
-  let context.filepath = a:filepath
-  call g:w#event_manager.notify('memo_after_write', context)
+  if w#database#archive(a:filepath, title, tags)
+    let context = {}
+    let context.filepath = a:filepath
+    let context.title    = title
+    let context.tags     = tags
+    call g:w#event_manager.notify('memo_after_write', context)
+  endif
 endfunction "}}}
 
 let &cpo = s:save_cpo

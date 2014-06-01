@@ -2,7 +2,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 function! w#feature#load_all(disable_features, event_manager) "{{{
-  let files = split(globpath(&rtp, 'autoload/w/features/*.vim'), '\n')
+  let files = split(globpath(&runtimepath, 'autoload/w/features/*.vim'), '\n')
 
   for array_f in map(files, "w#features#{fnamemodify(v:val, ':t:r')}#load()")
     let a = []

@@ -9,12 +9,9 @@ let s:Message = s:V.import('Vim.Message')
 let g:w#version  = 1
 
 function! w#bootstrap() "{{{
-  echo 'uho'
   if !w#database#startup()
     return 0
   endif
-  echo 'uho'
-  echo 'uho'
 
   " let r =  s:DB.query('vim_w', 'select name from sqlite_master')
   " let r =  s:DB.query('vim_w', 'insert into meta values(3, "hogepiyo");')
