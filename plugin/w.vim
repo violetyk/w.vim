@@ -7,8 +7,10 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 " global variables
-" let g:w_disable_features = get(g:, 'w_disable_features', ['sample'])
-let g:w_disable_features = []
+let g:w_sidebar_position = get(g:, 'w_sidebar_position', 'left')
+let g:w_sidebar_width    = get(g:, 'w_sidebar_width', 30)
+let g:w_disable_features = get(g:, 'w_disable_features', ['sample'])
+" let g:w_disable_features = []
 let g:w_of_vital         = get(g:, 'w_of_vital', 'vital')
 
 " default settings
@@ -30,11 +32,10 @@ if w#bootstrap()
           \ if isdirectory(dir) | call w#memo#write(expand("%:p")) | endif
   augroup END
 
-
-  command! Wopen call w#sidebar#open('mysidebar', 'left', 30)
-  command! Wclose call w#sidebar#close('mysidebar')
-  command! Wtoggle call w#sidebar#toggle('mysidebar')
-  command! Wnew  call w#memo#create()
+  command! WSidebarOpen call w#sidebar#open('wsidebar', g:w_sidebar_position, g:w_sidebar_width)
+  command! WSidebarClose call w#sidebar#close('wsidebar')
+  command! WSidebarToggle call w#sidebar#toggle('wsidebar')
+  command! WMemoNew  call w#memo#create()
 endif
 
 
