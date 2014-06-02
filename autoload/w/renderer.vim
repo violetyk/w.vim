@@ -6,18 +6,6 @@ set cpo&vim
 let s:V       = vital#of(g:w_of_vital)
 let s:Message = s:V.import('Vim.Message')
 
-function! w#bootstrap() "{{{
-  if !w#database#startup()
-    return 0
-  endif
-
-  call g:w#event_manager.notify('bootstrap')
-
-  return 1
-endfunction "}}}
-
-
-
 
 let &cpo = s:save_cpo
 unlet s:save_cpo

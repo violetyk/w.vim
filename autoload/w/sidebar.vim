@@ -37,9 +37,30 @@ function! w#sidebar#open(name, location, width) "{{{
   setlocal nocursorcolumn
   setfiletype w_sidebar
 
-  " setting statusline
-  " setting sidebar data
-  " bind mapping
+  " let renderer = g:w#settings.renderer()
+  " call renderer.render()
+
+  setlocal modifiable
+  call setline(line(".")+1, "=== test ===")
+  call cursor(line(".")+1, col("."))
+
+  " draw
+  let old_o = @o
+  let @o = 'hogehoge'
+  let @o = @o. 'piyopiyo'
+  let @o = @o. 'aaaa'
+  silent put o
+  let @o = old_o
+
+  " let old_scrolloff=&scrolloff
+  " let &scrolloff=0
+  " call cursor(topLine, 1)
+  normal! zt
+  " call cursor(curLine, curCol)
+  " let &scrolloff = old_scrolloff
+
+  setlocal nomodifiable
+
 
 endfunction "}}}
 
