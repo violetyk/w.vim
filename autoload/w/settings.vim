@@ -32,6 +32,10 @@ function! w#settings#default()
     return w#parser#new(a:filepath)
   endfunction "}}}
 
+  function! self.renderer() "{{{
+    return w#renderer#new()
+  endfunction "}}}
+
   function! self.database_dir() " {{{
     return $HOME . '/.vim_w/'
   endfunction " }}}

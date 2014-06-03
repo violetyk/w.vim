@@ -1,7 +1,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! w#events#new()
+function! w#event_manager#new()
   let self = {}
   let self._events = {}
 

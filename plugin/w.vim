@@ -9,36 +9,12 @@ set cpo&vim
 " global variables
 let g:w_sidebar_position = get(g:, 'w_sidebar_position', 'left')
 let g:w_sidebar_width    = get(g:, 'w_sidebar_width', 30)
-let g:w_disable_features = get(g:, 'w_disable_features', ['sample'])
-" let g:w_disable_features = []
+" let g:w_disable_features = get(g:, 'w_disable_features', ['sample'])
+let g:w_disable_features = []
 let g:w_of_vital         = get(g:, 'w_of_vital', 'vital')
 
-" default settings
-let g:w#settings = w#settings#default()
 
-" event manager
-let g:w#event_manager = w#events#new()
-
-" enable plugin feature
-call w#feature#load_all(g:w_disable_features, g:w#event_manager)
-
-" bootstrap
-if w#bootstrap()
-  " register auto commands
-  augroup w_vim_memo
-    autocmd!
-    autocmd BufWritePost *.txt 
-          \ let dir = finddir(g:w#settings.memo_dir(), escape(expand("%:p:h"), ' \') . ';') |
-          \ if isdirectory(dir) | call w#memo#write(expand("%:p")) | endif
-  augroup END
-
-  command! WSidebarOpen call w#sidebar#open('wsidebar', g:w_sidebar_position, g:w_sidebar_width)
-  command! WSidebarClose call w#sidebar#close('wsidebar')
-  command! WSidebarToggle call w#sidebar#toggle('wsidebar')
-  command! WMemoNew  call w#memo#create()
-endif
-
-
+call w#bootstrap()
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
