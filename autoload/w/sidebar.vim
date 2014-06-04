@@ -17,7 +17,7 @@ function! w#sidebar#open(name, location, width, ...) "{{{
 
     " callback
     if a:0 == 1 && type(a:1) == type(function('tr'))
-      call(a:1, [sidebar_buf])
+      call call(a:1, [sidebar_buf])
     endif
   else
     let sidebar_buf = s:get(a:name)

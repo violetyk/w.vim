@@ -7,16 +7,19 @@ let s:feature = {
       \}
 
 function! s:feature.events.bootstrap(...) "{{{
-  echo 'Loaded ' . s:feature.name
+  echo '[feature:sample] Loaded ' . s:feature.name
+endfunction "}}}
+function! s:feature.events.sidebar_initialize(...) "{{{
+  echo '[feature:sample] Initialize sidebar'
 endfunction "}}}
 function! s:feature.events.memo_before_create(...) "{{{
-  echo 'What do you write?'
+  echo '[feature:sample] What do you write?'
 endfunction "}}}
 function! s:feature.events.memo_after_create(...) "{{{
-  echo "Please don't forget to save!"
+  echo "[feature:sample] Please don't forget to save!"
 endfunction "}}}
 function! s:feature.events.memo_after_write(...) "{{{
-  echo "Write! " . a:1.filepath
+  echo "[feature:sample] Write! " . a:1.filepath
 endfunction "}}}
 
 function! w#features#sample#load() "{{{

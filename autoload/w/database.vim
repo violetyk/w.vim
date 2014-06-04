@@ -56,7 +56,7 @@ function! w#database#loadfile(path) "{{{
   return content
 endfunction "}}}
 
-function! w#database#archive(path, title, tags) "{{{
+function! w#database#save_memo(path, title, tags) "{{{
   let sql = "BEGIN;\n"
   let params = []
 
@@ -90,6 +90,13 @@ function! w#database#archive(path, title, tags) "{{{
     return 0
   endtry
 endfunction "}}}
+
+function! w#database#find_recently_memo(limit) "{{{
+  let sql = 'SELECT path, title FROM memos ORDER BY modified DESC LIMIT ?;'
+  return w#database#query(sql, [limit])
+endfunction "}}}
+
+
 
 
 let &cpo = s:save_cpo

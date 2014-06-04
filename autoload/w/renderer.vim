@@ -4,12 +4,11 @@ set cpo&vim
 
 " vital.vim
 let s:V       = vital#of(g:w_of_vital)
-let s:Message = s:V.import('Vim.Message')
 
-function! w#parser#new(filepath)
+function! w#renderer#new()
   let self = {}
 
-  function! self.render() "{{{
+  function! self.render(buffer) "{{{
     setlocal modifiable
     call setline(line(".")+1, "=== test ===")
     call cursor(line(".")+1, col("."))

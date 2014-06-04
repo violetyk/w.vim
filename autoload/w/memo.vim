@@ -55,7 +55,7 @@ function! w#memo#write(filepath) "{{{
   let title = parser.get_title()
   let tags  = parser.get_tags()
 
-  if w#database#archive(a:filepath, title, tags)
+  if w#database#save_memo(a:filepath, title, tags)
     let context = {}
     let context.filepath = a:filepath
     let context.title    = title
@@ -63,6 +63,8 @@ function! w#memo#write(filepath) "{{{
     call g:w#event_manager.notify('memo_after_write', context)
   endif
 endfunction "}}}
+
+
 
 let &cpo = s:save_cpo
 unlet s:save_cpo

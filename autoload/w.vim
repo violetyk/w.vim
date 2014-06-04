@@ -47,6 +47,7 @@ function! w#bootstrap() "{{{
 endfunction "}}}
 
 function! s:render(...) "{{{
+  call g:w#event_manager.notify('sidebar_initialize')
   let sidebar_buf = a:1
   let renderer = g:w#settings.renderer()
   call renderer.render(sidebar_buf)
