@@ -1,11 +1,6 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-
-" vital.vim
-let s:V       = vital#of(g:w_of_vital)
-let s:Message = s:V.import('Vim.Message')
-
 function! w#bootstrap() "{{{
 
   " default settings

@@ -52,7 +52,7 @@ endfunction "}}}
 
 function! w#memo#write(filepath) "{{{
   let parser = g:w#settings.parser(a:filepath)
-  let path = fnamemodify(path, ':s?' . g:w#settings.memo_dir() . '??')
+  let path = fnamemodify(a:filepath, ':s?' . g:w#settings.memo_dir() . '??')
   let title = parser.get_title()
   let tags  = parser.get_tags()
 
