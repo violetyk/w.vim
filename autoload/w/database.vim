@@ -91,9 +91,9 @@ function! w#database#save_memo(path, title, tags) "{{{
   endtry
 endfunction "}}}
 
-function! w#database#find_recently_memo(limit) "{{{
+function! w#database#find_mru_memo(limit) "{{{
   let sql = 'SELECT path, title FROM memos ORDER BY modified DESC LIMIT ?;'
-  return w#database#query(sql, [limit])
+  return w#database#query(sql, [a:limit])
 endfunction "}}}
 
 

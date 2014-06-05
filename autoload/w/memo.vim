@@ -52,14 +52,15 @@ endfunction "}}}
 
 function! w#memo#write(filepath) "{{{
   let parser = g:w#settings.parser(a:filepath)
+  let path = fnamemodify(path, ':s?' . g:w#settings.memo_dir() . '??')
   let title = parser.get_title()
   let tags  = parser.get_tags()
 
-  if w#database#save_memo(a:filepath, title, tags)
+  if w#database#save_memo(path, title, tags)
     let context = {}
-    let context.filepath = a:filepath
-    let context.title    = title
-    let context.tags     = tags
+    let context.path  = path
+    let context.title = title
+    let context.tags  = tags
     call g:w#event_manager.notify('memo_after_write', context)
   endif
 endfunction "}}}
