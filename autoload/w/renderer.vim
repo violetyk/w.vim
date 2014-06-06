@@ -9,7 +9,7 @@ function! w#renderer#new()
   let self = {}
   let self._buffer = {}
 
-  function! self.render(buffer) "{{{
+  function! self.view_main(buffer) "{{{
     let self._buffer = a:buffer
 
     let _line = line(".")
@@ -22,7 +22,7 @@ function! w#renderer#new()
     call self.draw_line("== MRU ==============================")
     for v in w#database#find_mru_memo(20)
       let path = g:w#settings.memo_dir() . v.path
-      call self.draw_line(self.indent(printf('%s <%s>', v.title, path), 1))
+      call self.draw_line(self.indent(printf('%s <%s>', v.title, path)))
     endfor
 
     let _scrolloff = &scrolloff

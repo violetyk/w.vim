@@ -24,7 +24,7 @@ function! w#bootstrap() "{{{
   augroup w_vim_memo
     autocmd!
     autocmd BufWritePost *
-          \ let dir = finddir(g:w#settings.memo_dir(), escape(expand("%:p:h"), ' \') . ';') |
+          \ let dir = finddir(g:w#settings.memo_dir(), escape(expand("%:p:h"), ' \') . ';') | echo expand("%:p:h") |
           \ if isdirectory(dir) | call w#memo#write(expand("%:p")) | endif
   augroup END
 
@@ -32,7 +32,7 @@ function! w#bootstrap() "{{{
   command! WSidebarOpen call w#sidebar#open('wsidebar',
         \ g:w_sidebar_position,
         \ g:w_sidebar_width,
-        \ s:func_ref('render', s:__sid())
+        \ s:func_ref('initialize', s:__sid())
         \ )
   command! WSidebarClose call w#sidebar#close('wsidebar')
   command! WSidebarToggle call w#sidebar#toggle('wsidebar')
@@ -41,11 +41,15 @@ function! w#bootstrap() "{{{
   return 1
 endfunction "}}}
 
-function! s:render(...) "{{{
-  call g:w#event_manager.notify('sidebar_initialize')
+function! s:initialize(...) "{{{
+  " buffer info
   let sidebar_buf = a:1
+
+  " initialize event
+  call g:w#event_manager.notify('sidebar_initialize')
+
   let renderer = g:w#settings.renderer()
-  call renderer.render(sidebar_buf)
+  call renderer.view_main(sidebar_buf)
 endfunction "}}}
 
 function! s:__sid() " {{{
