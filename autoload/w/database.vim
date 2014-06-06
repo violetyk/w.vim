@@ -91,12 +91,20 @@ function! w#database#save_memo(path, title, tags) "{{{
   endtry
 endfunction "}}}
 
-function! w#database#find_mru_memo(limit) "{{{
+function! w#database#find_mru_memos(limit) "{{{
   let sql = 'SELECT path, title FROM memos ORDER BY modified DESC LIMIT ?;'
   return w#database#query(sql, [a:limit])
 endfunction "}}}
 
+function! w#database#find_mru_tags(limit) "{{{
+  let sql = 'SELECT name, memo_count FROM tags ORDER BY modified DESC LIMIT ?;'
+  return w#database#query(sql, [a:limit])
+endfunction "}}}
 
+function! w#database#find_all_tags() "{{{
+  let sql = 'SELECT name, memo_count FROM tags ORDER BY name ASC;'
+  return w#database#query(sql, [])
+endfunction "}}}
 
 
 let &cpo = s:save_cpo

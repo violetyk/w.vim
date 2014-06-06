@@ -3,7 +3,8 @@ set cpo&vim
 
 
 " vital.vim
-let s:V       = vital#of(g:w_of_vital)
+let s:V      = vital#of(g:w_of_vital)
+let s:String = s:V.import('Data.String')
 
 function! w#renderer#new()
   let self = {}
@@ -19,11 +20,34 @@ function! w#renderer#new()
     call self.clear_all()
 
     setlocal modifiable
-    call self.draw_line("== MRU ==============================")
-    for v in w#database#find_mru_memo(20)
+
+    " Recent memos
+    call self.draw_line(self.section('Rcent Memos'))
+    let limit = 20
+    let i = 0
+    for v in w#database#find_mru_memos(limit)
       let path = g:w#settings.memo_dir() . v.path
-      call self.draw_line(self.indent(printf('%s <%s>', v.title, path)))
+      call self.draw_line(self.indent(printf('%s <%s>', s:String.pad_right(v.title, g:w_sidebar_width), path)))
+      let i = i + 1
     endfor
+    if i == limit
+      call self.draw_line('(more...)')
+    endif
+    call self.draw_line('')
+
+    " Recent tags
+    call self.draw_line(self.section('Recent Tags'))
+    for v in w#database#find_mru_tags(5)
+      call self.draw_line(self.indent(printf('[%s] %d', v.name, v.memo_count)))
+    endfor
+    call self.draw_line('')
+
+    " All tags
+    call self.draw_line(self.section('All Tags'))
+    for v in w#database#find_all_tags()
+      call self.draw_line(self.indent(printf('[%s] %d', v.name, v.memo_count)))
+    endfor
+
 
     let _scrolloff = &scrolloff
     let &scrolloff = 0
@@ -41,6 +65,10 @@ function! w#renderer#new()
 
 
     setlocal nomodifiable
+  endfunction "}}}
+
+  function! self.section(name) "{{{
+    return s:String.pad_right('=== ' . a:name . ' ', g:w_sidebar_width, '=')
   endfunction "}}}
 
   function! self.indent(str, ...) "{{{
