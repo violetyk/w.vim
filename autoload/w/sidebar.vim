@@ -3,25 +3,20 @@ set cpo&vim
 
 let s:sidebar_number = 0
 
-function! w#sidebar#open(name, location, width, ...) "{{{
+function! w#sidebar#open(name, location, width) "{{{
 
   let location =  a:location ==# 'left' ? 'topleft' : 'botright'
 
-  if !s:exists(a:name)
+  if !w#sidebar#exists(a:name)
     let sidebar_buf = s:alloc(a:name, location, a:width)
     silent! exec printf('%s vertical %d new', location, a:width)
     silent! exec printf('edit %s', sidebar_buf.bufname)
 
     " set buffer state
     call s:set_options()
-
-    " callback
-    if a:0 == 1 && type(a:1) == type(function('tr'))
-      call call(a:1, [sidebar_buf])
-    endif
   else
-    let sidebar_buf = s:get(a:name)
-    if !s:is_open(a:name)
+    let sidebar_buf = w#sidebar#get(a:name)
+    if !w#sidebar#is_open(a:name)
       " reopen & move to sidebar
       silent! exec printf('%s vertical %d split', location, a:width)
       silent! exec printf('buffer %s', sidebar_buf.bufname)
@@ -30,6 +25,8 @@ function! w#sidebar#open(name, location, width, ...) "{{{
       silent!exec printf('%swincmd w', bufwinnr(sidebar_buf.bufname))
     endif
   endif
+
+  return sidebar_buf
 endfunction "}}}
 
 function! w#sidebar#close(name) " {{{
@@ -38,7 +35,7 @@ function! w#sidebar#close(name) " {{{
     close
   else
     " move & close
-    let sidebar_buf = s:get(a:name)
+    let sidebar_buf = w#sidebar#get(a:name)
     let cmd = printf('%d wincmd w', bufwinnr(sidebar_buf.bufname))
     execute cmd
     close
@@ -46,11 +43,11 @@ function! w#sidebar#close(name) " {{{
 endfunction " }}}
 
 function! w#sidebar#toggle(name) "{{{
-  if s:exists(a:name)
-    if s:is_open(a:name)
+  if w#sidebar#exists(a:name)
+    if w#sidebar#is_open(a:name)
       call w#sidebar#close(a:name)
     else
-      let sidebar_buf = s:get(a:name)
+      let sidebar_buf = w#sidebar#get(a:name)
       call w#sidebar#open(a:name, sidebar_buf.location, sidebar_buf.width)
     endif
   endif
@@ -72,21 +69,21 @@ function! s:alloc(name, location, width) "{{{
   return d
 endfunction "}}}
 
-function! s:exists(name) "{{{
+function! w#sidebar#exists(name) "{{{
   let sidebar_buf = gettabvar(tabpagenr(), a:name, {})
   return !empty(sidebar_buf)
 endfunction "}}}
 
-function! s:get(name) "{{{
+function! w#sidebar#get(name) "{{{
   return gettabvar(tabpagenr(), a:name)
 endfunction "}}}
 
-function! s:is_open(name) "{{{
-  if !s:exists(a:name)
+function! w#sidebar#is_open(name) "{{{
+  if !w#sidebar#exists(a:name)
     return 0
   endif
 
-  let sidebar_buf = s:get(a:name)
+  let sidebar_buf = w#sidebar#get(a:name)
   return bufwinnr(sidebar_buf.bufname) != -1
 endfunction "}}}
 

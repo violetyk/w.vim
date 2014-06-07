@@ -18,8 +18,11 @@ endfunction "}}}
 function! s:feature.events.memo_after_create(...) "{{{
   echo "[feature:sample] Please don't forget to save!"
 endfunction "}}}
+function! s:feature.events.memo_before_write(...) "{{{
+  echo "[feature:sample] Before Write! " . a:1.filepath
+endfunction "}}}
 function! s:feature.events.memo_after_write(...) "{{{
-  echo "[feature:sample] Write! " . a:1.filepath
+  echo "[feature:sample] After Write! " . a:1.filepath
 endfunction "}}}
 
 function! w#features#sample#load() "{{{

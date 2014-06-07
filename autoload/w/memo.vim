@@ -7,16 +7,11 @@ let s:V    = vital#of(g:w_of_vital)
 let s:File = s:V.import('System.File')
 
 function! w#memo#create() "{{{
-  call g:w#event_manager.notify('memo_before_create')
-
   let memo_dir = g:w#settings.memo_dir()
   call s:File.mkdir_nothrow(memo_dir, 'p')
   let filepath = memo_dir . g:w#settings.filename()
   call w#memo#open(filepath)
-
-  let context = {}
-  let context.filepath = filepath
-  call g:w#event_manager.notify('memo_after_create', context)
+  return filepath
 endfunction "}}}
 
 function! w#memo#open(path, ...) " {{{
@@ -50,19 +45,11 @@ function! w#memo#open(path, ...) " {{{
   endif
 endfunction "}}}
 
-function! w#memo#write(filepath) "{{{
-  let parser = g:w#settings.parser(a:filepath)
+function! w#memo#write(filepath, parser) "{{{
   let path = fnamemodify(a:filepath, ':s?' . g:w#settings.memo_dir() . '??')
-  let title = parser.get_title()
-  let tags  = parser.get_tags()
-
-  if w#database#save_memo(path, title, tags)
-    let context = {}
-    let context.path  = path
-    let context.title = title
-    let context.tags  = tags
-    call g:w#event_manager.notify('memo_after_write', context)
-  endif
+  let title = a:parser.get_title()
+  let tags  = a:parser.get_tags()
+  return w#database#save_memo(path, title, tags)
 endfunction "}}}
 
 
