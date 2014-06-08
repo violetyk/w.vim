@@ -8,6 +8,9 @@ let s:String = s:V.import('Data.String')
 function! w#controller#new()
   let self = {}
   let self._buffer = {}
+  let self._section_name_recent_memos = 'Recent Memos'
+  let self._section_name_recent_tags = 'Recent Tags'
+  let self._section_name_all_tags = 'All Tags'
 
   function! self.startup(buffer) "{{{
     " A reference to the sidebar that contains me
@@ -22,20 +25,49 @@ function! w#controller#new()
   endfunction "}}}
 
   function! self.invoke() "{{{
-    " echo getline('.')
+    let section_type = self.detect_section_type(line('.'))
+
+    let line = getline('.')
+    if section_type == 'memo'
+      let path = matchstr(line, self.indent('.*\s<\zs.\+\ze>$'))
+      call w#edit_memo(path)
+    endif
+  endfunction "}}}
+
+
+  function! self.detect_section_type(line_number) "{{{
+    let section_type = ''
+
+    " scan upward
+    let n = a:line_number
+    let sections = {
+          \ self.section(self._section_name_recent_memos) : 'memo',
+          \ self.section(self._section_name_recent_tags)  : 'tag',
+          \ self.section(self._section_name_all_tags)     : 'tag'
+          \ }
+    while n > 0
+      if index(keys(sections), getline(n)) != -1
+        let section_type = sections[getline(n)]
+        break
+      endif
+
+      let n = n - 1
+    endwhile
+
+    return section_type
   endfunction "}}}
 
   function! self.view_main() "{{{
-    let _line = line(".")
-    let _col  = col(".")
-    let _top_line_of_buffer = line("w0")
+    let _line = line('.')
+    let _col  = col('.')
+    let _top_line_of_buffer = line('w0')
 
     call self.clear_all()
 
     setlocal modifiable
 
     " Recent memos
-    call self.draw_line(self.section('Rcent Memos'))
+    call self.draw_line(self.section(self._section_name_recent_memos))
     let limit = 20
     let i = 0
     for v in w#database#find_mru_memos(limit)
@@ -49,14 +81,14 @@ function! w#controller#new()
     call self.draw_line('')
 
     " Recent tags
-    call self.draw_line(self.section('Recent Tags'))
+    call self.draw_line(self.section(self._section_name_recent_tags))
     for v in w#database#find_mru_tags(5)
       call self.draw_line(self.indent(printf('[%s] %d', v.name, v.memo_count)))
     endfor
     call self.draw_line('')
 
     " All tags
-    call self.draw_line(self.section('All Tags'))
+    call self.draw_line(self.section(self._section_name_all_tags))
     for v in w#database#find_all_tags()
       call self.draw_line(self.indent(printf('[%s] %d', v.name, v.memo_count)))
     endfor
@@ -93,9 +125,10 @@ function! w#controller#new()
     return _s . a:str
   endfunction "}}}
 
-  " write and new line (default)
   function! self.draw_line(str, ...) "{{{
     call setline(line(".") + 1, a:str)
+
+    " write and new line (default)
     if a:0 == 0 || a:1 == 0
       call cursor(line(".") + 1, col("."))
     endif
