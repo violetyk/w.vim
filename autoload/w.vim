@@ -23,17 +23,17 @@ function! w#bootstrap() "{{{
   call g:w#event_manager.notify('bootstrap')
 
   " register auto commands
-  augroup w_vim_memo
+  augroup w_vim_note
     autocmd!
     autocmd BufWritePost *
-          \ if w#in_memo_dir(expand("%:p"))| call w#write_memo(expand("%:p")) | endif
+          \ if w#in_note_dir(expand("%:p"))| call w#write_note(expand("%:p")) | endif
   augroup END
 
   " register commands
   command! WSidebarOpen call w#open_sidebar()
   " command! WSidebarClose call w#sidebar#close('wsidebar')
   " command! WSidebarToggle call w#sidebar#toggle('wsidebar')
-  command! WMemoNew  call w#create_memo()
+  command! WNoteNew  call w#create_note()
 
   return 1
 endfunction "}}}
@@ -50,22 +50,22 @@ function! w#open_sidebar() "{{{
   call g:w#event_manager.notify('sidebar_initialize', sidebar)
 endfunction "}}}
 
-function! w#in_memo_dir(filepath) "{{{
-  return match(a:filepath, '^' . g:w#settings.memo_dir()) != -1
+function! w#in_note_dir(filepath) "{{{
+  return match(a:filepath, '^' . g:w#settings.note_dir()) != -1
 endfunction "}}}
 
-function! w#create_memo() "{{{
-  call g:w#event_manager.notify('memo_before_create')
+function! w#create_note() "{{{
+  call g:w#event_manager.notify('note_before_create')
 
-  let filepath = w#memo#create()
-  call w#open_memo(filepath)
+  let filepath = w#note#create()
+  call w#open_note(filepath)
 
   let context = {}
   let context.filepath = filepath
-  call g:w#event_manager.notify('memo_after_create', context)
+  call g:w#event_manager.notify('note_after_create', context)
 endfunction "}}}
 
-function! w#open_memo(path, ...) " {{{
+function! w#open_note(path, ...) " {{{
 
   if !bufexists(a:path)
     exec "badd " . a:path
@@ -96,20 +96,20 @@ function! w#open_memo(path, ...) " {{{
   endif
 endfunction "}}}
 
-function! w#write_memo(filepath) "{{{
+function! w#write_note(filepath) "{{{
   " get parser
   let parser = g:w#settings.parser(a:filepath)
 
   let context = {}
   let context.fileath = a:filepath
   let context.parser  = parser
-  call g:w#event_manager.notify('memo_before_write', context)
+  call g:w#event_manager.notify('note_before_write', context)
 
   " write
-  if w#memo#write(a:filepath, parser)
+  if w#note#write(a:filepath, parser)
     let context.fileath = a:filepath
     let context.parser  = parser
-    call g:w#event_manager.notify('memo_after_write', context)
+    call g:w#event_manager.notify('note_after_write', context)
 
     " reload sidebar
     let sidebar = w#sidebar#get(s:sidebar_name)
@@ -120,10 +120,10 @@ function! w#write_memo(filepath) "{{{
   endif
 endfunction "}}}
 
-function! w#edit_memo(path) "{{{
+function! w#edit_note(path) "{{{
   if strlen(a:path) && filereadable(a:path)
     execute 'wincmd p'
-    call w#open_memo(a:path)
+    call w#open_note(a:path)
   endif
 
 endfunction "}}}

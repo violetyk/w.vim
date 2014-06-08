@@ -10,12 +10,12 @@ let s:Random   = s:V.import('Random.Xor128')
 function! w#settings#default()
   let self = {}
 
-  function! self.memo_dir() " {{{
-    return $HOME . '/.vim_w/memo/'
+  function! self.note_dir() " {{{
+    return $HOME . '/.vim_w/notes/'
   endfunction " }}}
 
-  function! self.memo_extension() "{{{
-    return '.txt'
+  function! self.note_extension() "{{{
+    return '.md'
   endfunction "}}}
 
   function! self.filename() "{{{
@@ -24,7 +24,7 @@ function! w#settings#default()
           \ d.format('%Y%m%d%H%M%S'),
           \ abs(s:Random.rand()),
           \ hostname(),
-          \ self.memo_extension()
+          \ self.note_extension()
           \ )
   endfunction "}}}
 

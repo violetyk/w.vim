@@ -1,3 +1,8 @@
+if !nerdtree#isWindowUsable(winnr("#"))
+    call nerdtree#exec(nerdtree#firstUsableWindow() . "wincmd w")
+else
+    call nerdtree#exec('wincmd p')
+endif
 let s:save_cpo = &cpo
 set cpo&vim
 
@@ -8,7 +13,7 @@ let s:String = s:V.import('Data.String')
 function! w#controller#new()
   let self = {}
   let self._buffer = {}
-  let self._section_name_recent_memos = 'Recent Memos'
+  let self._section_name_recent_notes = 'Recent Notes'
   let self._section_name_recent_tags = 'Recent Tags'
   let self._section_name_all_tags = 'All Tags'
 
@@ -28,9 +33,9 @@ function! w#controller#new()
     let section_type = self.detect_section_type(line('.'))
 
     let line = getline('.')
-    if section_type == 'memo'
+    if section_type == 'note'
       let path = matchstr(line, self.indent('.*\s<\zs.\+\ze>$'))
-      call w#edit_memo(path)
+      call w#edit_note(path)
     endif
   endfunction "}}}
 
@@ -41,7 +46,7 @@ function! w#controller#new()
     " scan upward
     let n = a:line_number
     let sections = {
-          \ self.section(self._section_name_recent_memos) : 'memo',
+          \ self.section(self._section_name_recent_notes) : 'note',
           \ self.section(self._section_name_recent_tags)  : 'tag',
           \ self.section(self._section_name_all_tags)     : 'tag'
           \ }
@@ -66,12 +71,12 @@ function! w#controller#new()
 
     setlocal modifiable
 
-    " Recent memos
-    call self.draw_line(self.section(self._section_name_recent_memos))
+    " Recent notes
+    call self.draw_line(self.section(self._section_name_recent_notes))
     let limit = 20
     let i = 0
-    for v in w#database#find_mru_memos(limit)
-      let path = g:w#settings.memo_dir() . v.path
+    for v in w#database#find_mru_notes(limit)
+      let path = g:w#settings.note_dir() . v.path
       call self.draw_line(self.indent(printf('%s <%s>', s:String.pad_right(v.title, g:w_sidebar_width), path)))
       let i = i + 1
     endfor
@@ -83,14 +88,14 @@ function! w#controller#new()
     " Recent tags
     call self.draw_line(self.section(self._section_name_recent_tags))
     for v in w#database#find_mru_tags(5)
-      call self.draw_line(self.indent(printf('[%s] %d', v.name, v.memo_count)))
+      call self.draw_line(self.indent(printf('[%s] %d', v.name, v.note_count)))
     endfor
     call self.draw_line('')
 
     " All tags
     call self.draw_line(self.section(self._section_name_all_tags))
     for v in w#database#find_all_tags()
-      call self.draw_line(self.indent(printf('[%s] %d', v.name, v.memo_count)))
+      call self.draw_line(self.indent(printf('[%s] %d', v.name, v.note_count)))
     endfor
 
 

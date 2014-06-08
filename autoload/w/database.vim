@@ -56,25 +56,25 @@ function! w#database#loadfile(path) "{{{
   return content
 endfunction "}}}
 
-function! w#database#save_memo(path, title, tags) "{{{
+function! w#database#save_note(path, title, tags) "{{{
   let sql = "BEGIN;\n"
   let params = []
 
-  " UPSERT memo
-  let sql .= "INSERT OR IGNORE INTO memos(path, title, modified) VALUES(?, ?, DATETIME('now','localtime'));\n"
-  let sql .= "UPDATE memos SET modified = DATETIME('now','localtime') WHERE path = ?;\n"
+  " UPSERT note
+  let sql .= "INSERT OR IGNORE INTO notes(path, title, modified) VALUES(?, ?, DATETIME('now','localtime'));\n"
+  let sql .= "UPDATE notes SET modified = DATETIME('now','localtime') WHERE path = ?;\n"
   call add(params, a:path)
   call add(params, a:title)
   call add(params, a:path)
 
   " tags
   if !empty(a:tags)
-    let sql .= "REPLACE INTO memo_tags(memo_path, tags) VALUES(?, ?);\n"
+    let sql .= "REPLACE INTO note_tags(note_path, tags) VALUES(?, ?);\n"
     call add(params, a:path)
     call add(params, join(a:tags))
 
     for tag in a:tags
-      let sql .= "REPLACE INTO tags(name, memo_count) VALUES(?, (SELECT count(memo_path) FROM memo_tags WHERE tags MATCH ?));"
+      let sql .= "REPLACE INTO tags(name, note_count) VALUES(?, (SELECT count(note_path) FROM note_tags WHERE tags MATCH ?));"
       call add(params, tag)
       call add(params, tag)
     endfor
@@ -91,18 +91,18 @@ function! w#database#save_memo(path, title, tags) "{{{
   endtry
 endfunction "}}}
 
-function! w#database#find_mru_memos(limit) "{{{
-  let sql = 'SELECT path, title FROM memos ORDER BY modified DESC LIMIT ?;'
+function! w#database#find_mru_notes(limit) "{{{
+  let sql = 'SELECT path, title FROM notes ORDER BY modified DESC LIMIT ?;'
   return w#database#query(sql, [a:limit])
 endfunction "}}}
 
 function! w#database#find_mru_tags(limit) "{{{
-  let sql = 'SELECT name, memo_count FROM tags ORDER BY modified DESC LIMIT ?;'
+  let sql = 'SELECT name, note_count FROM tags ORDER BY modified DESC LIMIT ?;'
   return w#database#query(sql, [a:limit])
 endfunction "}}}
 
 function! w#database#find_all_tags() "{{{
-  let sql = 'SELECT name, memo_count FROM tags ORDER BY name ASC;'
+  let sql = 'SELECT name, note_count FROM tags ORDER BY name ASC;'
   return w#database#query(sql, [])
 endfunction "}}}
 
