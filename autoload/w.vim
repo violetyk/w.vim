@@ -114,8 +114,8 @@ function! w#write_note(filepath) "{{{
     " reload sidebar
     let sidebar = w#sidebar#get(s:sidebar_name)
     if !empty(sidebar)
-      echo 'reload!!'
-      " call w#renderer#reload(sidebar)
+      " TODO: to abstract
+      call sidebar.controller.reload_view()
     endif
   endif
 endfunction "}}}

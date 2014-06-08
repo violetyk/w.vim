@@ -62,8 +62,9 @@ function! w#database#save_note(path, title, tags) "{{{
 
   " UPSERT note
   let sql .= "INSERT OR IGNORE INTO notes(path, title, modified) VALUES(?, ?, DATETIME('now','localtime'));\n"
-  let sql .= "UPDATE notes SET modified = DATETIME('now','localtime') WHERE path = ?;\n"
+  let sql .= "UPDATE notes SET title = ?, modified = DATETIME('now','localtime') WHERE path = ?;\n"
   call add(params, a:path)
+  call add(params, a:title)
   call add(params, a:title)
   call add(params, a:path)
 

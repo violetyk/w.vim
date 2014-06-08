@@ -29,6 +29,10 @@ function! w#controller#new()
 
   endfunction "}}}
 
+  function! self.reload_view() "{{{
+    call self.view_main()
+  endfunction "}}}
+
   function! self.invoke() "{{{
     let section_type = self.detect_section_type(line('.'))
 
@@ -38,7 +42,6 @@ function! w#controller#new()
       call w#edit_note(path)
     endif
   endfunction "}}}
-
 
   function! self.detect_section_type(line_number) "{{{
     let section_type = ''
