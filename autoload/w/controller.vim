@@ -1,18 +1,31 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-
 " vital.vim
 let s:V      = vital#of(g:w_of_vital)
 let s:String = s:V.import('Data.String')
 
-function! w#renderer#new()
+function! w#controller#new()
   let self = {}
   let self._buffer = {}
 
-  function! self.view_main(buffer) "{{{
+  function! self.startup(buffer) "{{{
+    " A reference to the sidebar that contains me
     let self._buffer = a:buffer
 
+    " bind mappings
+    execute printf('nnoremap <buffer> <silent> <CR> :<C-u>call w#sidebar#get(''%s'').controller.invoke()<CR>', self._buffer.name)
+
+    " render main
+    call self.view_main()
+
+  endfunction "}}}
+
+  function! self.invoke() "{{{
+    " echo getline('.')
+  endfunction "}}}
+
+  function! self.view_main() "{{{
     let _line = line(".")
     let _col  = col(".")
     let _top_line_of_buffer = line("w0")
@@ -55,14 +68,6 @@ function! w#renderer#new()
     normal! zt
     call cursor(_line, _col)
     let &scrolloff = _scrolloff
-
-    " let old_o = @o
-    " let @o = 'hogehoge'
-    " let @o = @o. 'piyopiyo'
-    " let @o = @o. 'aaaa'
-    " silent put o
-    " let @o = old_o
-
 
     setlocal nomodifiable
   endfunction "}}}

@@ -3,17 +3,25 @@ set cpo&vim
 
 let s:sidebar_number = 0
 
-function! w#sidebar#open(name, location, width) "{{{
+function! w#sidebar#open(name, location, width, controller, ...) "{{{
 
   let location =  a:location ==# 'left' ? 'topleft' : 'botright'
 
   if !w#sidebar#exists(a:name)
-    let sidebar_buf = s:alloc(a:name, location, a:width)
+    let sidebar_buf = s:alloc(a:name, location, a:width, a:controller)
     silent! exec printf('%s vertical %d new', location, a:width)
     silent! exec printf('edit %s', sidebar_buf.bufname)
 
     " set buffer state
     call s:set_options()
+
+    " allocated sidebar start a own controller
+    call sidebar_buf.controller.startup(w#sidebar#get(a:name))
+
+    " callback
+    if a:0 == 1 && type(a:1) == type(function('tr'))
+      call call(a:1, [sidebar_buf])
+    endif
   else
     let sidebar_buf = w#sidebar#get(a:name)
     if !w#sidebar#is_open(a:name)
@@ -53,15 +61,17 @@ function! w#sidebar#toggle(name) "{{{
   endif
 endfunction "}}}
 
-function! s:alloc(name, location, width) "{{{
+function! s:alloc(name, location, width, controller) "{{{
   " script scope
   let s:sidebar_number = s:sidebar_number + 1
 
   let d = gettabvar(tabpagenr(), a:name, {
-        \ 'bufname'  : printf('%s_%d', a:name, s:sidebar_number),
-        \ 'number'   : s:sidebar_number,
-        \ 'location' : a:location,
-        \ 'width'    : a:width
+        \ 'name'      : a:name,
+        \ 'bufname'   : printf('%s_%d', a:name, s:sidebar_number),
+        \ 'number'    : s:sidebar_number,
+        \ 'location'  : a:location,
+        \ 'width'     : a:width,
+        \ 'controller': a:controller
         \ })
 
   call settabvar(tabpagenr(), a:name, d)

@@ -32,8 +32,8 @@ function! w#settings#default()
     return w#parser#new(a:filepath)
   endfunction "}}}
 
-  function! self.renderer() "{{{
-    return w#renderer#new()
+  function! self.controller() "{{{
+    return w#controller#new()
   endfunction "}}}
 
   function! self.database_dir() " {{{
