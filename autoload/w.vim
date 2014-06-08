@@ -58,7 +58,7 @@ function! w#create_memo() "{{{
   call g:w#event_manager.notify('memo_before_create')
 
   let filepath = w#memo#create()
-  call w#open(filepath)
+  call w#open_memo(filepath)
 
   let context = {}
   let context.filepath = filepath
