@@ -14,10 +14,14 @@ function! w#note#create() "{{{
 endfunction "}}}
 
 function! w#note#write(filepath, parser) "{{{
-  let path = fnamemodify(a:filepath, ':s?' . g:w#settings.note_dir() . '??')
-  let title = a:parser.get_title()
-  let tags  = a:parser.get_tags()
-  return w#database#save_note(path, title, tags)
+  let path     = fnamemodify(a:filepath, ':s?' . g:w#settings.note_dir() . '??')
+  let title    = a:parser.get_title()
+  let new_tags = a:parser.get_tags()
+
+  let bufvar = w#buffer#getvar(a:filepath, g:w#settings.bufvar_name())
+  let old_tags = get(bufvar, 'tags', {})
+
+  return w#database#save_note(path, title, new_tags, old_tags)
 endfunction "}}}
 
 

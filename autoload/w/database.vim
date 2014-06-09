@@ -56,7 +56,7 @@ function! w#database#loadfile(path) "{{{
   return content
 endfunction "}}}
 
-function! w#database#save_note(path, title, tags) "{{{
+function! w#database#save_note(path, title, new_tags, old_tags) "{{{
   let sql = "BEGIN;\n"
   let params = []
 
@@ -68,13 +68,20 @@ function! w#database#save_note(path, title, tags) "{{{
   call add(params, a:title)
   call add(params, a:path)
 
+
   " tags
-  if !empty(a:tags)
+  if !empty(a:new_tags)
     let sql .= "REPLACE INTO note_tags(note_path, tags) VALUES(?, ?);\n"
     call add(params, a:path)
-    call add(params, join(a:tags))
+    call add(params, join(a:new_tags))
 
-    for tag in a:tags
+
+    let tags = a:new_tags
+    " update tags count
+    if !empty(a:old_tags)
+      let tags += a:old_tags
+    endif
+    for tag in tags
       let sql .= "REPLACE INTO tags(name, note_count) VALUES(?, (SELECT count(note_path) FROM note_tags WHERE tags MATCH ?));"
       call add(params, tag)
       call add(params, tag)

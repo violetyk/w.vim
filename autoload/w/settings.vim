@@ -44,6 +44,10 @@ function! w#settings#default()
     return 'w.sqlite'
   endfunction " }}}
 
+  function! self.bufvar_name() "{{{
+    return 'wbufvar'
+  endfunction "}}}
+
   return self
 endfunction
 

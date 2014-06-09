@@ -39,7 +39,7 @@ function! w#controller#new()
     let line = getline('.')
     if section_type == 'note'
       let path = matchstr(line, self.indent('.*\s<\zs.\+\ze>$'))
-      call w#edit_note(path)
+      call w#buffer#edit(path)
     endif
   endfunction "}}}
 

@@ -58,42 +58,11 @@ function! w#create_note() "{{{
   call g:w#event_manager.notify('note_before_create')
 
   let filepath = w#note#create()
-  call w#open_note(filepath)
+  call w#buffer#add_new(filepath)
 
   let context = {}
   let context.filepath = filepath
   call g:w#event_manager.notify('note_after_create', context)
-endfunction "}}}
-
-function! w#open_note(path, ...) " {{{
-
-  if !bufexists(a:path)
-    exec "badd " . a:path
-  endif
-
-  let l:option = get(a:000, 1, '')
-  let l:line   = get(a:000, 2, 0)
-
-  let buf_no = bufnr(a:path)
-  if buf_no != -1
-    if l:option == 's'
-      exec "sb" . buf_no
-    elseif l:option == 'v'
-      exec "vert sb" . buf_no
-    elseif l:option == 't'
-      exec "tabedit"
-      exec "b" . buf_no
-    else
-      exec "b" . buf_no
-    endif
-
-    if type(l:line) == type(0) && l:line > 0
-      exec l:line
-      exec "normal! z\<CR>"
-      exec "normal! ^"
-    endif
-
-  endif
 endfunction "}}}
 
 function! w#write_note(filepath) "{{{
@@ -103,6 +72,7 @@ function! w#write_note(filepath) "{{{
   let context = {}
   let context.fileath = a:filepath
   let context.parser  = parser
+  
   call g:w#event_manager.notify('note_before_write', context)
 
   " write
@@ -118,14 +88,6 @@ function! w#write_note(filepath) "{{{
       call sidebar.controller.reload_view()
     endif
   endif
-endfunction "}}}
-
-function! w#edit_note(path) "{{{
-  if strlen(a:path) && filereadable(a:path)
-    execute 'wincmd p'
-    call w#open_note(a:path)
-  endif
-
 endfunction "}}}
 
 function! s:__sid() " {{{
