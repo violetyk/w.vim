@@ -5,15 +5,8 @@ CREATE TABLE "notes" (
   "path" TEXT NOT NULL,
   "title" TEXT,
   "created" TIMESTAMP NOT NULL DEFAULT (DATETIME('now','localtime')),
-  "modified" TIMESTAMP NOT NULL,
+  "modified" TIMESTAMP NOT NULL DEFAULT (DATETIME('now','localtime')),
   PRIMARY KEY("path")
-);
-
-DROP TABLE IF EXISTS "note_tags";
-CREATE VIRTUAL TABLE note_tags USING fts4(
-  "note_path" TEXT,
-  "tags" TEXT,
-  PRIMARY KEY("note_path")
 );
 
 DROP TABLE IF EXISTS "tags";
@@ -23,5 +16,13 @@ CREATE TABLE "tags" (
   "modified" TIMESTAMP NOT NULL DEFAULT (DATETIME('now','localtime')),
   PRIMARY KEY("name")
 );
+
+DROP TABLE IF EXISTS "search_data";
+CREATE VIRTUAL TABLE search_data USING fts4(
+  "note_path" TEXT NOT NULL,
+  "tags" TEXT,
+  PRIMARY KEY("note_path")
+);
+
 
 COMMIT;
