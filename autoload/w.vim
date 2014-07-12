@@ -25,6 +25,8 @@ function! w#bootstrap() "{{{
   " register auto commands
   augroup w_vim_note
     autocmd!
+    autocmd BufRead *
+          \ if w#in_note_dir(expand("%:p"))| call w#read_note(expand("%:p")) | endif
     autocmd BufWritePost *
           \ if w#in_note_dir(expand("%:p"))| call w#write_note(expand("%:p")) | endif
   augroup END
@@ -71,21 +73,19 @@ function! w#write_note(filepath) "{{{
   let title    = parser.get_title()
   let new_tags = parser.get_tags()
 
-  let bufvar   = w#buffer#getvar(a:filepath, g:w#settings.bufvar_name())
-  let old_tags = get(bufvar, 'tags', {})
-
-  let context           = {}
-  let context.fileath   = a:filepath
-  let context.title     = title
-  let context.bufvar    = bufvar
-  let context.new_tagss = new_tags
-  let context.old_tags  = old_tags
+  let context          = {}
+  let context.filepath = a:filepath
+  let context.title    = title
+  let context.tagss    = new_tags
 
   call g:w#event_manager.notify('note_before_write', context)
 
+  let bufvar   = w#buffer#getvar(a:filepath, g:w#settings.bufvar_name())
+  let old_tags = get(bufvar, 'tags', {})
+
   " write
   if w#note#write(a:filepath, title, new_tags, old_tags)
-    
+
     " update current bufvar
     call w#buffer#setvar(a:filepath, g:w#settings.bufvar_name(), {
           \ 'title' : title,
@@ -101,6 +101,24 @@ function! w#write_note(filepath) "{{{
 
     call g:w#event_manager.notify('note_after_write', context)
   endif
+endfunction "}}}
+
+function! w#read_note(filepath) "{{{
+  let parser = g:w#settings.parser(a:filepath)
+  let title  = parser.get_title()
+  let tags   = parser.get_tags()
+
+  call w#buffer#setvar(a:filepath, g:w#settings.bufvar_name(), {
+        \ 'title' : title,
+        \ 'tags'  : tags,
+        \ })
+
+  let context          = {}
+  let context.filepath = a:filepath
+  let context.title    = title
+  let context.tags     = tags
+
+  call g:w#event_manager.notify('note_after_read', context)
 endfunction "}}}
 
 function! w#debug() "{{{

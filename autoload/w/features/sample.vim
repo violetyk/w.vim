@@ -12,17 +12,20 @@ endfunction "}}}
 function! s:feature.events.sidebar_initialize(...) "{{{
   echo '[feature:sample] Initialize sidebar'
 endfunction "}}}
-function! s:feature.events.memo_before_create(...) "{{{
+function! s:feature.events.note_before_create(...) "{{{
   echo '[feature:sample] What do you write?'
 endfunction "}}}
-function! s:feature.events.memo_after_create(...) "{{{
+function! s:feature.events.note_after_create(...) "{{{
   echo "[feature:sample] Please don't forget to save!"
 endfunction "}}}
-function! s:feature.events.memo_before_write(...) "{{{
+function! s:feature.events.note_before_write(...) "{{{
   echo "[feature:sample] Before Write! " . a:1.filepath
 endfunction "}}}
-function! s:feature.events.memo_after_write(...) "{{{
+function! s:feature.events.note_after_write(...) "{{{
   echo "[feature:sample] After Write! " . a:1.filepath
+endfunction "}}}
+function! s:feature.events.note_after_read(...) "{{{
+  echo "[feature:sample] After Read! " . a:1.filepath
 endfunction "}}}
 
 function! w#features#sample#load() "{{{

@@ -9,15 +9,8 @@ endfunction "}}}
 function! w#buffer#edit(path) "{{{
   if strlen(a:path) && filereadable(a:path)
     execute 'wincmd p'
-
-    let parser = g:w#settings.parser(a:path)
-    let bufvar_dict = {g:w#settings.bufvar_name() : {
-          \ 'title' : parser.get_title(),
-          \ 'tags'  : parser.get_tags(),
-          \ }}
-    call s:open(a:path, 'n', 3, bufvar_dict)
+    call s:open(a:path, 'n', 3)
   endif
-
 endfunction "}}}
 
 function! w#buffer#setvar(expr, name, value) "{{{
@@ -36,7 +29,7 @@ function! w#buffer#getvar(expr, name) "{{{
   return {}
 endfunction "}}}
 
-function! s:open(path, method, line, bufvar_dict) " {{{
+function! s:open(path, method, line) " {{{
 
   if !bufexists(a:path)
     exec "badd " . a:path
@@ -60,11 +53,6 @@ function! s:open(path, method, line, bufvar_dict) " {{{
       exec "normal! z\<CR>"
       exec "normal! ^"
     endif
-
-    if !empty(a:bufvar_dict)
-      call w#buffer#setvar(a:path, keys(a:bufvar_dict)[0], values(a:bufvar_dict)[0])
-    endif
-
   endif
 endfunction "}}}
 
