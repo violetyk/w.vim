@@ -66,20 +66,31 @@ function! w#create_note() "{{{
 endfunction "}}}
 
 function! w#write_note(filepath) "{{{
-  " get parser
-  let parser = g:w#settings.parser(a:filepath)
+  " parse
+  let parser   = g:w#settings.parser(a:filepath)
+  let title    = parser.get_title()
+  let new_tags = parser.get_tags()
 
-  let context = {}
-  let context.fileath = a:filepath
-  let context.parser  = parser
-  
+  let bufvar   = w#buffer#getvar(a:filepath, g:w#settings.bufvar_name())
+  let old_tags = get(bufvar, 'tags', {})
+
+  let context           = {}
+  let context.fileath   = a:filepath
+  let context.title     = title
+  let context.bufvar    = bufvar
+  let context.new_tagss = new_tags
+  let context.old_tags  = old_tags
+
   call g:w#event_manager.notify('note_before_write', context)
 
   " write
-  if w#note#write(a:filepath, parser)
-    let context.fileath = a:filepath
-    let context.parser  = parser
-    call g:w#event_manager.notify('note_after_write', context)
+  if w#note#write(a:filepath, title, new_tags, old_tags)
+    
+    " update current bufvar
+    call w#buffer#setvar(a:filepath, g:w#settings.bufvar_name(), {
+          \ 'title' : title,
+          \ 'tags'  : new_tags,
+          \ })
 
     " reload sidebar
     let sidebar = w#sidebar#get(s:sidebar_name)
@@ -87,7 +98,14 @@ function! w#write_note(filepath) "{{{
       " TODO: to abstract
       call sidebar.controller.reload_view()
     endif
+
+    call g:w#event_manager.notify('note_after_write', context)
   endif
+endfunction "}}}
+
+function! w#debug() "{{{
+  let bufvar = w#buffer#getvar(expand("%:p"), g:w#settings.bufvar_name())
+  echo bufvar
 endfunction "}}}
 
 function! s:__sid() " {{{

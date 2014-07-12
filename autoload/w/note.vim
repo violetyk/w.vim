@@ -13,15 +13,9 @@ function! w#note#create() "{{{
   return filepath
 endfunction "}}}
 
-function! w#note#write(filepath, parser) "{{{
+function! w#note#write(filepath, title, new_tags, old_tags) "{{{
   let path     = fnamemodify(a:filepath, ':s?' . g:w#settings.note_dir() . '??')
-  let title    = a:parser.get_title()
-  let new_tags = a:parser.get_tags()
-
-  let bufvar = w#buffer#getvar(a:filepath, g:w#settings.bufvar_name())
-  let old_tags = get(bufvar, 'tags', {})
-
-  return w#database#save_note(path, title, new_tags, old_tags)
+  return w#database#save_note(path, a:title, a:new_tags, a:old_tags)
 endfunction "}}}
 
 

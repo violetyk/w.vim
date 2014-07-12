@@ -4,6 +4,7 @@ DROP TABLE IF EXISTS "notes";
 CREATE TABLE "notes" (
   "path" TEXT NOT NULL,
   "title" TEXT,
+  "context" TEXT,
   "created" TIMESTAMP NOT NULL DEFAULT (DATETIME('now','localtime')),
   "modified" TIMESTAMP NOT NULL DEFAULT (DATETIME('now','localtime')),
   PRIMARY KEY("path")

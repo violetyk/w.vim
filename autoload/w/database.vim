@@ -57,46 +57,38 @@ function! w#database#loadfile(path) "{{{
 endfunction "}}}
 
 function! w#database#save_note(path, title, new_tags, old_tags) "{{{
-  " let sql = "BEGIN;\n"
-  let sql = ""
+  let sql = "BEGIN;\n"
   let params = []
 
   " UPSERT note
   let sql .= "INSERT OR IGNORE INTO notes(path, title) VALUES(?, ?);\n"
+  call add(params, a:path)
+  call add(params, a:title)
   let sql .= "UPDATE notes SET title = ?, modified = DATETIME('now','localtime') WHERE path = ?;\n"
-  call add(params, a:path)
-  call add(params, a:title)
   call add(params, a:title)
   call add(params, a:path)
 
 
-  " tags
+  " UPSERT search_data
   let sql .= "DELETE FROM search_data WHERE note_path = ?;\n"
   call add(params, a:path)
+  let sql .= "INSERT INTO search_data(note_path, tags) VALUES(?, ?);\n"
+  call add(params, a:path)
+  call add(params, join(a:new_tags))
 
-  if !empty(a:new_tags)
-
-    let sql .= "INSERT INTO search_data(note_path, tags) VALUES(?, ?);\n"
-    call add(params, a:path)
-    call add(params, join(a:new_tags))
-
-    let tags = a:new_tags
-    " update tags count
-    if !empty(a:old_tags)
-      let tags += a:old_tags
-    endif
-    for tag in tags
-      let sql .= "INSERT OR REPLACE INTO tags(name, note_count) VALUES(?, (SELECT count(note_path) FROM search_data WHERE tags MATCH ?));\n"
-      echo tag
-      call add(params, tag)
-      call add(params, tag)
-    endfor
-    let sql .= "DELETE FROM tags WHERE note_count = 0;\n"
+  " UPDATE tags
+  let tags = deepcopy(a:new_tags)
+  if !empty(a:old_tags)
+    let tags += a:old_tags
   endif
+  for tag in tags
+    let sql .= "INSERT OR REPLACE INTO tags(name, note_count) VALUES(?, (SELECT count(note_path) FROM search_data WHERE tags MATCH ?));\n"
+    call add(params, tag)
+    call add(params, tag)
+  endfor
+  let sql .= "DELETE FROM tags WHERE note_count = 0;\n"
 
-  " let sql .= "COMMIT;\n"
-
-  echo sql
+  let sql .= "COMMIT;\n"
   try
     call w#database#query(sql, params)
     return 1
