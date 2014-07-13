@@ -97,9 +97,27 @@ function! w#database#save_note(path, title, new_tags, old_tags) "{{{
   endtry
 endfunction "}}}
 
-function! w#database#find_mru_notes(limit) "{{{
-  let sql = 'SELECT path, title FROM notes ORDER BY modified DESC LIMIT ?;'
-  return w#database#query(sql, [a:limit])
+function! w#database#find_notes(option) "{{{
+  let params = []
+  let sql  = "SELECT path, title FROM notes\n"
+
+  " where tag
+  if has_key(a:option, 'tag')
+    let sql .= "WHERE path IN (SELECT note_path FROM search_data WHERE tags MATCH ?);\n"
+    call add(params, a:option.tag)
+  endif
+
+  " order by
+  let sql .= "ORDER BY modified DESC\n"
+
+  " limit
+  if has_key(a:option, 'limit')
+    let sql .= "LIMIT ?\n"
+    call add(params, a:option.limit)
+  endif
+
+  let sql .= ";"
+  return w#database#query(sql, params)
 endfunction "}}}
 
 function! w#database#find_mru_tags(limit) "{{{

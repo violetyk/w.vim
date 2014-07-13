@@ -9,8 +9,8 @@ set cpo&vim
 " global variables
 let g:w_sidebar_position = get(g:, 'w_sidebar_position', 'left')
 let g:w_sidebar_width    = get(g:, 'w_sidebar_width', 30)
-" let g:w_disable_features = get(g:, 'w_disable_features', ['sample'])
-let g:w_disable_features = []
+let g:w_disable_features = get(g:, 'w_disable_features', ['sample'])
+" let g:w_disable_features = []
 let g:w_of_vital         = get(g:, 'w_of_vital', 'vital')
 
 

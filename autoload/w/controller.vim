@@ -1,8 +1,8 @@
-if !nerdtree#isWindowUsable(winnr("#"))
-    call nerdtree#exec(nerdtree#firstUsableWindow() . "wincmd w")
-else
-    call nerdtree#exec('wincmd p')
-endif
+" if !nerdtree#isWindowUsable(winnr("#"))
+    " call nerdtree#exec(nerdtree#firstUsableWindow() . "wincmd w")
+" else
+    " call nerdtree#exec('wincmd p')
+" endif
 let s:save_cpo = &cpo
 set cpo&vim
 
@@ -16,6 +16,7 @@ function! w#controller#new()
   let self._section_name_recent_notes = 'Recent Notes'
   let self._section_name_recent_tags = 'Recent Tags'
   let self._section_name_all_tags = 'All Tags'
+  let self._section_name_notes = 'Notes'
 
   function! self.startup(buffer) "{{{
     " A reference to the sidebar that contains me
@@ -23,6 +24,7 @@ function! w#controller#new()
 
     " bind mappings
     execute printf('nnoremap <buffer> <silent> <CR> :<C-u>call w#sidebar#get(''%s'').controller.invoke()<CR>', self._buffer.name)
+    execute printf('nnoremap <buffer> <silent> <nowait> h :<C-u>call w#sidebar#get(''%s'').controller.view_main()<CR>', self._buffer.name)
 
     " render main
     call self.view_main()
@@ -38,8 +40,17 @@ function! w#controller#new()
 
     let line = getline('.')
     if section_type == 'note'
-      let path = matchstr(line, self.indent('.*\s<\zs.\+\ze>$'))
-      call w#buffer#edit(path)
+      if line == '(more...)'
+        call self.view_search({})
+      else
+        let path = matchstr(line, self.indent('.*\s<\zs.\+\ze>$'))
+        call w#buffer#edit(path)
+      endif
+    elseif section_type == 'tag'
+      let tag = s:String.trim(matchstr(line, self.indent('\[\zs.\+\ze\]\s\d\+$')))
+      if strlen(tag)
+        call self.view_search({'tag': tag})
+      endif
     endif
   endfunction "}}}
 
@@ -51,7 +62,8 @@ function! w#controller#new()
     let sections = {
           \ self.section(self._section_name_recent_notes) : 'note',
           \ self.section(self._section_name_recent_tags)  : 'tag',
-          \ self.section(self._section_name_all_tags)     : 'tag'
+          \ self.section(self._section_name_all_tags)     : 'tag',
+          \ self.section(self._section_name_notes)        : 'note'
           \ }
     while n > 0
       if index(keys(sections), getline(n)) != -1
@@ -65,6 +77,36 @@ function! w#controller#new()
     return section_type
   endfunction "}}}
 
+  function! self.view_search(context) "{{{
+    let _line = line('.')
+    let _col  = col('.')
+    let _top_line_of_buffer = line('w0')
+
+    call self.clear_all()
+
+    setlocal modifiable
+
+    call self.draw_navigation()
+    call self.draw_line(self.section(self._section_name_notes))
+
+    " search notes
+    for v in w#database#find_notes(a:context)
+      if has_key(v, 'path')
+        let path = g:w#settings.note_dir() . v.path
+        call self.draw_line(self.indent(printf('%s <%s>', s:String.pad_right(v.title, g:w_sidebar_width), path)))
+      endif
+    endfor
+
+    let _scrolloff = &scrolloff
+    let &scrolloff = 0
+    call cursor(_top_line_of_buffer, 1)
+    normal! zt
+    call cursor(_line, _col)
+    let &scrolloff = _scrolloff
+
+    setlocal nomodifiable
+  endfunction "}}}
+
   function! self.view_main() "{{{
     let _line = line('.')
     let _col  = col('.')
@@ -74,11 +116,13 @@ function! w#controller#new()
 
     setlocal modifiable
 
+    call self.draw_navigation()
+
     " Recent notes
     call self.draw_line(self.section(self._section_name_recent_notes))
     let limit = 20
     let i = 0
-    for v in w#database#find_mru_notes(limit)
+    for v in w#database#find_notes({'limit': limit})
       let path = g:w#settings.note_dir() . v.path
       call self.draw_line(self.indent(printf('%s <%s>', s:String.pad_right(v.title, g:w_sidebar_width), path)))
       let i = i + 1
@@ -110,6 +154,11 @@ function! w#controller#new()
     let &scrolloff = _scrolloff
 
     setlocal nomodifiable
+  endfunction "}}}
+
+  function! self.draw_navigation() "{{{
+    call setline(line("."), '" h: Home  m: Menu')
+    call self.draw_line('')
   endfunction "}}}
 
   function! self.section(name) "{{{

@@ -2,8 +2,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 function! w#buffer#add_new(path, ...) "{{{
-  let bufvar_dict = get(a:000, 1, {})
-  call s:open(a:path, 'n', 0, bufvar_dict)
+  call s:open(a:path, 'n', 0)
 endfunction "}}}
 
 function! w#buffer#edit(path) "{{{
