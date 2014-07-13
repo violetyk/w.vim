@@ -32,8 +32,8 @@ function! w#settings#default()
     return w#parser#new(a:filepath)
   endfunction "}}}
 
-  function! self.controller() "{{{
-    return w#controller#new()
+  function! self.sidebar_controller() "{{{
+    return w#sidebar_controller#new()
   endfunction "}}}
 
   function! self.database_dir() " {{{

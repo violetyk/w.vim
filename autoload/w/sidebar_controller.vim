@@ -1,8 +1,3 @@
-" if !nerdtree#isWindowUsable(winnr("#"))
-    " call nerdtree#exec(nerdtree#firstUsableWindow() . "wincmd w")
-" else
-    " call nerdtree#exec('wincmd p')
-" endif
 let s:save_cpo = &cpo
 set cpo&vim
 
@@ -10,7 +5,7 @@ set cpo&vim
 let s:V      = vital#of(g:w_of_vital)
 let s:String = s:V.import('Data.String')
 
-function! w#controller#new()
+function! w#sidebar_controller#new()
   let self = {}
   let self._buffer = {}
   let self._section_name_recent_notes = 'Recent Notes'
@@ -25,6 +20,7 @@ function! w#controller#new()
     " bind mappings
     execute printf('nnoremap <buffer> <silent> <CR> :<C-u>call w#sidebar#get(''%s'').controller.invoke()<CR>', self._buffer.name)
     execute printf('nnoremap <buffer> <silent> <nowait> h :<C-u>call w#sidebar#get(''%s'').controller.view_main()<CR>', self._buffer.name)
+    execute printf('nnoremap <buffer> <silent> <nowait> m :<C-u>call w#sidebar#get(''%s'').controller.call_menu()<CR>', self._buffer.name)
 
     " render main
     call self.view_main()
@@ -154,6 +150,10 @@ function! w#controller#new()
     let &scrolloff = _scrolloff
 
     setlocal nomodifiable
+  endfunction "}}}
+
+  function! self.call_menu() "{{{
+
   endfunction "}}}
 
   function! self.draw_navigation() "{{{

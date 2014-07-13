@@ -33,8 +33,8 @@ function! w#bootstrap() "{{{
 
   " register commands
   command! WSidebarOpen call w#open_sidebar()
-  " command! WSidebarClose call w#sidebar#close('wsidebar')
-  " command! WSidebarToggle call w#sidebar#toggle('wsidebar')
+  command! WSidebarClose call w#close_sidebar()
+  " command! WSidebarToggle call w#toggle_sidebar()
   command! WNoteNew  call w#create_note()
 
   return 1
@@ -45,11 +45,19 @@ function! w#open_sidebar() "{{{
         \ s:sidebar_name,
         \ g:w_sidebar_position,
         \ g:w_sidebar_width,
-        \ g:w#settings.controller()
+        \ g:w#settings.sidebar_controller()
         \ )
 
   " initialize event
   call g:w#event_manager.notify('sidebar_initialize', sidebar)
+endfunction "}}}
+
+function! w#close_sidebar() "{{{
+  call w#sidebar#close(s:sidebar_name)
+endfunction "}}}
+
+function! w#toggle_sidebar() "{{{
+  " call w#sidebar#toggle(s:sidebar_name)
 endfunction "}}}
 
 function! w#in_note_dir(filepath) "{{{
