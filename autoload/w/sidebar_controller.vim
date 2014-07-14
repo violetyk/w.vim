@@ -19,35 +19,55 @@ function! w#sidebar_controller#new()
 
     " bind mappings
     execute printf('nnoremap <buffer> <silent> <CR> :<C-u>call w#sidebar#get(''%s'').controller.invoke()<CR>', self._buffer.name)
-    execute printf('nnoremap <buffer> <silent> <nowait> h :<C-u>call w#sidebar#get(''%s'').controller.view_main()<CR>', self._buffer.name)
-    execute printf('nnoremap <buffer> <silent> <nowait> m :<C-u>call w#sidebar#get(''%s'').controller.call_menu()<CR>', self._buffer.name)
+    execute printf('nnoremap <buffer> <silent> <nowait> h :<C-u>call w#sidebar#get(''%s'').controller.main()<CR>', self._buffer.name)
+    execute printf('nnoremap <buffer> <silent> <nowait> m :<C-u>call w#sidebar#get(''%s'').controller.show_menu()<CR>', self._buffer.name)
 
     " render main
-    call self.view_main()
+    call self.main()
 
   endfunction "}}}
 
   function! self.reload_view() "{{{
-    call self.view_main()
+    call self.main()
   endfunction "}}}
 
   function! self.invoke() "{{{
-    let section_type = self.detect_section_type(line('.'))
-
-    let line = getline('.')
-    if section_type == 'note'
-      if line == '(more...)'
-        call self.view_search({})
-      else
-        let path = matchstr(line, self.indent('.*\s<\zs.\+\ze>$'))
-        call w#buffer#edit(path)
-      endif
-    elseif section_type == 'tag'
-      let tag = s:String.trim(matchstr(line, self.indent('\[\zs.\+\ze\]\s\d\+$')))
-      if strlen(tag)
-        call self.view_search({'tag': tag})
-      endif
+    let node = self.current_node()
+    if empty(node)
+      return
     endif
+
+    if node.type == 'note'
+
+      if node.line ==  '(more...)'
+        call self.search({})
+      elseif strlen(node.filepath) > 0
+        call w#buffer#edit(node.filepath)
+      endif
+
+    elseif node.type == 'tag'
+
+      call self.search({'tag': node.tag})
+
+    endif
+  endfunction "}}}
+
+  function! self.current_node() "{{{
+    let node = {}
+    let section_type = self.detect_section_type(line('.'))
+    let line = getline('.')
+
+    if section_type == 'note'
+      let node['type']     = 'note'
+      let node['filepath'] = matchstr(line, self.indent('.*\s<\zs.\+\ze>$'))
+      let node['line']     = line
+    elseif section_type == 'tag'
+      let node['type'] = 'tag'
+      let node['tag']  = s:String.trim(matchstr(line, self.indent('\[\zs.\+\ze\]\s\d\+$')))
+      let node['line'] = line
+    endif
+
+    return node
   endfunction "}}}
 
   function! self.detect_section_type(line_number) "{{{
@@ -73,7 +93,7 @@ function! w#sidebar_controller#new()
     return section_type
   endfunction "}}}
 
-  function! self.view_search(context) "{{{
+  function! self.search(context) "{{{
     let _line = line('.')
     let _col  = col('.')
     let _top_line_of_buffer = line('w0')
@@ -103,7 +123,7 @@ function! w#sidebar_controller#new()
     setlocal nomodifiable
   endfunction "}}}
 
-  function! self.view_main() "{{{
+  function! self.main() "{{{
     let _line = line('.')
     let _col  = col('.')
     let _top_line_of_buffer = line('w0')
@@ -152,8 +172,10 @@ function! w#sidebar_controller#new()
     setlocal nomodifiable
   endfunction "}}}
 
-  function! self.call_menu() "{{{
-
+  function! self.show_menu() "{{{
+    let menu_controller = g:w#settings.menu_controller()
+    call menu_controller.show()
+    unlet menu_controller
   endfunction "}}}
 
   function! self.draw_navigation() "{{{

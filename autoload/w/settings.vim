@@ -36,6 +36,10 @@ function! w#settings#default()
     return w#sidebar_controller#new()
   endfunction "}}}
 
+  function! self.menu_controller() "{{{
+    return w#menu_controller#new()
+  endfunction "}}}
+
   function! self.database_dir() " {{{
     return $HOME . '/.vim_w/'
   endfunction " }}}
