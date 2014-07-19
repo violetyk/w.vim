@@ -116,7 +116,7 @@ function! s:set_options() "{{{
 
   setlocal nocursorline
   setlocal nocursorcolumn
-  setfiletype w_sidebar
+  setfiletype wsidebar
 endfunction "}}}
 
 let &cpo = s:save_cpo
