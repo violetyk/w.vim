@@ -19,8 +19,10 @@ function! w#sidebar_controller#new()
 
     " bind mappings
     execute printf('nnoremap <buffer> <silent> <CR> :<C-u>call w#sidebar#get(''%s'').controller.invoke()<CR>', self._buffer.name)
-    execute printf('nnoremap <buffer> <silent> <nowait> h :<C-u>call w#sidebar#get(''%s'').controller.main()<CR>', self._buffer.name)
+    execute printf('nnoremap <buffer> <silent> <nowait> ~ :<C-u>call w#sidebar#get(''%s'').controller.main()<CR>', self._buffer.name)
     execute printf('nnoremap <buffer> <silent> <nowait> m :<C-u>call w#sidebar#get(''%s'').controller.show_menu()<CR>', self._buffer.name)
+    execute 'nnoremap <buffer> <silent> <nowait> c :<C-u>call w#create_note()<CR>'
+    execute 'nnoremap <buffer> <silent> <nowait> q :<C-u>call w#close_sidebar()<CR>'
 
     " render main
     call self.main()
@@ -42,7 +44,7 @@ function! w#sidebar_controller#new()
       if node.line ==  '(more...)'
         call self.search({})
       elseif strlen(node.filepath) > 0
-        call w#buffer#edit(node.filepath)
+        call w#buffer#edit(node.filepath, 3)
       endif
 
     elseif node.type == 'tag'
@@ -179,7 +181,9 @@ function! w#sidebar_controller#new()
   endfunction "}}}
 
   function! self.draw_navigation() "{{{
-    call setline(line("."), '" h: Home  m: Menu')
+    call setline(line("."), '" ~: Home  c: Create')
+    call self.draw_line('')
+    call setline(line("."), '" m: Menu  q: Quit')
     call self.draw_line('')
   endfunction "}}}
 

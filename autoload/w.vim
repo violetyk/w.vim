@@ -68,7 +68,7 @@ function! w#create_note() "{{{
   call g:w#event_manager.notify('note_before_create')
 
   let filepath = w#note#create()
-  call w#buffer#add_new(filepath)
+  call w#buffer#edit(filepath)
 
   let context = {}
   let context.filepath = filepath
