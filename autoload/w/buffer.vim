@@ -7,12 +7,20 @@ function! w#buffer#edit(path, ...) "{{{
     let line = a:1
   endif
 
+  " current window
+  if w#buffer#is_window_usable(winnr())
+    call s:open(a:path, 'n', line)
+    return
+  endif
+
+  " previous window
   if w#buffer#is_window_usable(winnr("#"))
     execute winnr('#'). 'wincmd w'
     call s:open(a:path, 'n', line)
     return
   endif
 
+  " find usable window
   let winnr = w#buffer#find_usable_window()
   if winnr != -1
     execute winnr . 'wincmd w'
@@ -20,6 +28,7 @@ function! w#buffer#edit(path, ...) "{{{
     return
   endif
 
+  " open new window vertically
   call s:open(a:path, 'v', line)
 
 endfunction "}}}
@@ -66,10 +75,10 @@ function! w#buffer#in_windows(bufnr) " {{{
 endfunction " }}}
 
 function! w#buffer#is_window_usable(winnr) " {{{
-  let window_count = winnr('$')
-  if window_count ==# 1 " last window
-    return 0
-  endif
+  " let window_count = winnr('$')
+  " if window_count ==# 1 " last window
+    " return 0
+  " endif
 
   " get status of window
   let bufnr = winbufnr(a:winnr)
