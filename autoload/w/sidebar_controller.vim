@@ -184,7 +184,8 @@ function! w#sidebar_controller#new()
   endfunction "}}}
 
   function! self.section(name) "{{{
-    return s:String.pad_right('=== ' . a:name . ' ', g:w_sidebar_width, '=')
+    return '* ' . a:name
+    " return s:String.pad_right('--- ' . a:name . ' ', g:w_sidebar_width, '-')
   endfunction "}}}
 
   function! self.indent(str, ...) "{{{

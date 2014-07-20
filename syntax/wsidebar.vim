@@ -7,11 +7,11 @@ set cpo&vim
 syntax region WSidebarHelp start=/^"/ end=/$/ contains=WSidebarHelpKey
 syntax match  WSidebarHelpKey '\s\zs.\ze:' contained
 
-" syntax match  WSidebarSectionName '^@\zs.*\ze$' contains=WSidebarSectionMark
-
-
+syntax match  WSidebarSectionName '^\*\s.*$'
 
 syntax match  WSidebarNotePath '<.\+>$' conceal
+syntax match  WSidebarTag '\(\s\+\)\zs.*\ze\(\s\d\+$\)'
+syntax match  WSidebarMore  '^(more\.\.\.)$'
 
 
 " :h group-name
@@ -19,6 +19,7 @@ highlight link WSidebarHelp Comment
 highlight link WSidebarHelpKey Identifier
 highlight link WSidebarSectionName PreProc
 highlight link WSidebarTag Tag
+highlight link WSidebarMore Tag
 
 set conceallevel=3
 

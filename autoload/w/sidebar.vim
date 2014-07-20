@@ -114,7 +114,7 @@ function! s:set_options() "{{{
 
   iabc <buffer>
 
-  setlocal nocursorline
+  setlocal cursorline
   setlocal nocursorcolumn
   setfiletype wsidebar
 endfunction "}}}
