@@ -101,6 +101,17 @@ function! w#database#find_notes(option) "{{{
   let params = []
   let sql  = "SELECT path, title FROM notes\n"
 
+  " where path
+  if has_key(a:option, 'path')
+    if type(a:option.path) == type([])
+      let sql .= "WHERE path IN (?);\n"
+      call add(params, join(a:option.path))
+    else
+      let sql .= "WHERE path = ?;\n"
+      call add(params, a:option.path)
+    endif
+  endif
+
   " where tag
   if has_key(a:option, 'tag')
     let sql .= "WHERE path IN (SELECT note_path FROM search_data WHERE tags MATCH ?);\n"

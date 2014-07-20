@@ -21,6 +21,7 @@ function! w#sidebar_controller#new()
     execute printf('nnoremap <buffer> <silent> <CR> :<C-u>call w#sidebar#get(''%s'').controller.invoke()<CR>', self._buffer.name)
     execute printf('nnoremap <buffer> <silent> <nowait> ~ :<C-u>call w#sidebar#get(''%s'').controller.main()<CR>', self._buffer.name)
     execute printf('nnoremap <buffer> <silent> <nowait> m :<C-u>call w#sidebar#get(''%s'').controller.show_menu()<CR>', self._buffer.name)
+    execute printf('nnoremap <buffer> <silent> <nowait> s :<C-u>call w#sidebar#get(''%s'').controller.grep("")<CR>', self._buffer.name)
     execute 'nnoremap <buffer> <silent> <nowait> c :<C-u>call w#create_note()<CR>'
     execute 'nnoremap <buffer> <silent> <nowait> q :<C-u>call w#close_sidebar()<CR>'
 
@@ -42,14 +43,14 @@ function! w#sidebar_controller#new()
     if node.type == 'note'
 
       if node.line ==  '(more...)'
-        call self.search({})
+        call self.find({})
       elseif strlen(node.filepath) > 0
         call w#buffer#edit(node.filepath, 3)
       endif
 
     elseif node.type == 'tag'
 
-      call self.search({'tag': node.tag})
+      call self.find({'tag': node.tag})
 
     endif
   endfunction "}}}
@@ -95,7 +96,16 @@ function! w#sidebar_controller#new()
     return section_type
   endfunction "}}}
 
-  function! self.search(context) "{{{
+  function! self.grep(word) "{{{
+
+    let word = a:word
+    if word == ''
+      let word = input('Grep word: ')
+    endif
+    if word == ''
+      return
+    endif
+
     let _line = line('.')
     let _col  = col('.')
     let _top_line_of_buffer = line('w0')
@@ -107,7 +117,70 @@ function! w#sidebar_controller#new()
     call self.draw_navigation()
     call self.draw_line(self.section(self._section_name_notes))
 
-    " search notes
+
+    let is_qflist_open = 0
+    let i = 1
+    while i <= winnr('$')
+      let bufnr = winbufnr(i)
+
+      if bufnr == -1
+        break
+      endif
+
+      if getbufvar(bufnr, '&buftype') == 'quickfix'
+        let is_qflist_open = 1
+        break
+      endif
+
+      let i += 1
+    endwhile
+
+    let current_qflist = getqflist()
+
+    try
+      call setqflist([], ' ')
+      execute printf('silent vimgrep /%s/jg %s', word, g:w#settings.note_dir() . '*')
+      execute self.winnr() . 'wincmd w'
+
+      for d in getqflist()
+        let f = bufname(d.bufnr)
+        let path = fnamemodify(f, ':s?' . g:w#settings.note_dir() . '??')
+        let notes = w#database#find_notes({'path': path})
+        if has_key(notes[0], 'title')
+          call self.draw_line(self.indent(printf('%s <%s>', s:String.pad_right(notes[0].title, g:w_sidebar_width), notes[0].path)))
+        endif
+      endfor
+
+    finally
+      call setqflist(current_qflist, 'r')
+      if is_qflist_open == 0
+        execute 'cclose'
+      endif
+    endtry
+
+    let _scrolloff = &scrolloff
+    let &scrolloff = 0
+    call cursor(_top_line_of_buffer, 1)
+    normal! zt
+    call cursor(_line, _col)
+    let &scrolloff = _scrolloff
+
+    setlocal nomodifiable
+  endfunction "}}}
+
+  function! self.find(context) "{{{
+    let _line = line('.')
+    let _col  = col('.')
+    let _top_line_of_buffer = line('w0')
+
+    call self.clear_all()
+
+    setlocal modifiable
+
+    call self.draw_navigation()
+    call self.draw_line(self.section(self._section_name_notes))
+
+    " find notes
     for v in w#database#find_notes(a:context)
       if has_key(v, 'path')
         let path = g:w#settings.note_dir() . v.path
@@ -183,7 +256,7 @@ function! w#sidebar_controller#new()
   function! self.draw_navigation() "{{{
     call setline(line("."), '" ~: Home  c: Create')
     call self.draw_line('')
-    call setline(line("."), '" m: Menu  q: Quit')
+    call setline(line("."), '" m: Menu  s: Search')
     call self.draw_line('')
   endfunction "}}}
 
@@ -230,6 +303,9 @@ function! w#sidebar_controller#new()
     setlocal nomodifiable
   endfunction "}}}
 
+    function! self.winnr() "{{{
+      return bufwinnr(bufnr(self._buffer.bufname))
+    endfunction "}}}
   return self
 
 endfunction
