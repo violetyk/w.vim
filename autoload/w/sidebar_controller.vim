@@ -142,12 +142,18 @@ function! w#sidebar_controller#new()
       execute printf('silent vimgrep /%s/jg %s', word, g:w#settings.note_dir() . '*')
       execute self.winnr() . 'wincmd w'
 
+      let note_dir = g:w#settings.note_dir()
+
       for d in getqflist()
         let f = bufname(d.bufnr)
-        let path = fnamemodify(f, ':s?' . g:w#settings.note_dir() . '??')
-        let notes = w#database#find_notes({'path': path})
+        let path = fnamemodify(f, ':s?' . note_dir . '??')
+        let notes = w#database#find_notes({'path': path, 'limit': 1})
         if has_key(notes[0], 'title')
-          call self.draw_line(self.indent(printf('%s <%s>', s:String.pad_right(notes[0].title, g:w_sidebar_width), notes[0].path)))
+          call self.draw_line(self.indent(
+                \ printf('%s <%s>',
+                \ s:String.pad_right(notes[0].title, g:w_sidebar_width),
+                \ note_dir . notes[0].path
+                \ )))
         endif
       endfor
 

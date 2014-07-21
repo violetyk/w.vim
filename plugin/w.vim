@@ -12,6 +12,8 @@ let g:w_sidebar_width    = get(g:, 'w_sidebar_width', 30)
 let g:w_disable_features = get(g:, 'w_disable_features', ['sample'])
 " let g:w_disable_features = []
 let g:w_of_vital         = get(g:, 'w_of_vital', 'vital')
+let g:w_note_dir         = get(g:, 'w_note_dir', $HOME . '/.vim_w/notes/')
+let g:w_database_dir     = get(g:, 'w_database_dir', $HOME . '/.vim_w/')
 
 
 call w#bootstrap()

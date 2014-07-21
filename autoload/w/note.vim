@@ -7,9 +7,8 @@ let s:V    = vital#of(g:w_of_vital)
 let s:File = s:V.import('System.File')
 
 function! w#note#create() "{{{
-  let note_dir = g:w#settings.note_dir()
-  call s:File.mkdir_nothrow(note_dir, 'p')
-  let filepath = note_dir . g:w#settings.filename()
+  let filepath = g:w#settings.note_dir() . g:w#settings.filename()
+  call s:File.mkdir_nothrow(fnamemodify(filepath, ':p:h'), 'p')
   return filepath
 endfunction "}}}
 

@@ -11,7 +11,11 @@ function! w#settings#default()
   let self = {}
 
   function! self.note_dir() " {{{
-    return $HOME . '/.vim_w/notes/'
+    let dir = g:w_note_dir
+    if match(dir, '/$') < 0
+      let dir = dir . '/'
+    endif
+    return dir
   endfunction " }}}
 
   function! self.note_extension() "{{{
@@ -20,12 +24,10 @@ function! w#settings#default()
 
   function! self.filename() "{{{
     let d = s:DateTime.now()
-    return printf('%s%s_%s%s',
-          \ d.format('%Y%m%d%H%M%S'),
-          \ abs(s:Random.rand()),
-          \ hostname(),
-          \ self.note_extension()
-          \ )
+    let rand = abs(s:Random.rand())
+    return d.format('%Y/%m/%d/%H%M%S')
+          \ . rand
+          \ . self.note_extension()
   endfunction "}}}
 
   function! self.parser(filepath) "{{{
@@ -41,7 +43,11 @@ function! w#settings#default()
   endfunction "}}}
 
   function! self.database_dir() " {{{
-    return $HOME . '/.vim_w/'
+    let dir = g:w_database_dir
+    if match(dir, '/$') < 0
+      let dir = dir . '/'
+    endif
+    return dir
   endfunction " }}}
 
   function! self.database_file() " {{{
