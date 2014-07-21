@@ -55,6 +55,23 @@ function! w#sidebar_controller#new()
     endif
   endfunction "}}}
 
+  function! self.show_menu() "{{{
+    let node = self.current_node()
+    if empty(node)
+      return
+    endif
+
+    if node.type == 'note' && strlen(node.filepath) > 0
+      let menu_controller = w#menu_controller#new(
+            \ node,
+            \ w#feature#load_menu(g:w_disable_features)
+            \ )
+      call menu_controller.show()
+      unlet menu_controller
+    endif
+  endfunction "}}}
+
+
   function! self.current_node() "{{{
     let node = {}
     let section_type = self.detect_section_type(line('.'))
@@ -252,12 +269,6 @@ function! w#sidebar_controller#new()
     let &scrolloff = _scrolloff
 
     setlocal nomodifiable
-  endfunction "}}}
-
-  function! self.show_menu() "{{{
-    let menu_controller = g:w#settings.menu_controller()
-    call menu_controller.show()
-    unlet menu_controller
   endfunction "}}}
 
   function! self.draw_navigation() "{{{

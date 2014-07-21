@@ -97,6 +97,12 @@ function! w#database#save_note(path, title, new_tags, old_tags) "{{{
   endtry
 endfunction "}}}
 
+function! w#database#delete_note(path) "{{{
+
+  return 1
+
+endfunction "}}}
+
 function! w#database#find_notes(option) "{{{
   let params = []
   let sql  = "SELECT path, title FROM notes\n"

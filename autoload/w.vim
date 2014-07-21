@@ -12,7 +12,7 @@ function! w#bootstrap() "{{{
   let g:w#event_manager = w#event_manager#new()
 
   " enable plugin feature
-  call w#feature#load_all(g:w_disable_features, g:w#event_manager)
+  call w#feature#load_listeners(g:w_disable_features, g:w#event_manager, 'event')
 
   " initialize database
   if !w#database#startup()
@@ -26,7 +26,7 @@ function! w#bootstrap() "{{{
   augroup w_vim_note
     autocmd!
     autocmd BufEnter *
-          \ if w#buffer#is_window_usable(winnr()) && w#in_note_dir(expand("%:p"))| call w#read_note(expand("%:p")) | endif
+          \ if w#buffer#is_window_usable(winnr()) && filereadable(expand("%:p")) && w#in_note_dir(expand("%:p"))| call w#read_note(expand("%:p")) | endif
     autocmd BufWritePost *
           \ if w#in_note_dir(expand("%:p"))| call w#write_note(expand("%:p")) | endif
   augroup END
@@ -34,8 +34,6 @@ function! w#bootstrap() "{{{
   " register commands
   command! WSidebarOpen call w#open_sidebar()
   command! WSidebarClose call w#close_sidebar()
-  " command! WSidebarToggle call w#toggle_sidebar()
-  command! WNoteNew  call w#create_note()
 
   return 1
 endfunction "}}}
@@ -128,6 +126,28 @@ function! w#read_note(filepath) "{{{
 
   call g:w#event_manager.notify('note_after_read', context)
 endfunction "}}}
+
+function! w#delete_note(filepath) "{{{
+
+  let context          = {}
+  let context.filepath = a:filepath
+
+  call g:w#event_manager.notify('note_before_delete', context)
+
+  " delete
+  if w#note#delete(a:filepath)
+
+    " reload sidebar
+    let sidebar = w#sidebar#get(s:sidebar_name)
+    if !empty(sidebar)
+      " TODO: to abstract
+      call sidebar.controller.reload_view()
+    endif
+
+    call g:w#event_manager.notify('note_after_delete', context)
+  endif
+endfunction "}}}
+
 
 function! w#debug() "{{{
   let bufvar = w#buffer#getvar(expand("%:p"), g:w#settings.bufvar_name())

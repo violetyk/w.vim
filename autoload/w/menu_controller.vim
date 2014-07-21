@@ -4,10 +4,11 @@ set cpo&vim
 " vital.vim
 let s:V      = vital#of(g:w_of_vital)
 
-function! w#menu_controller#new()
+function! w#menu_controller#new(context, menu)
   let self = {}
   let self._selected_index = -1
-  let self.menu = []
+  let self.context = a:context
+  let self.menu = a:menu
 
   function! self.show() "{{{
     let _lazyredraw = &lazyredraw
@@ -34,7 +35,8 @@ function! w#menu_controller#new()
 
     let selected = get(self.menu, self._selected_index, {})
     if !empty(selected)
-      " invoke menu command
+      let Fnction = selected.callback
+      call call(Fnction, [self.context], selected)
     endif
   endfunction "}}}
 
@@ -43,7 +45,7 @@ function! w#menu_controller#new()
       call self._cursor_down()
     elseif a:key == 'k'
       call self._cursor_up()
-    elseif a:key == nr2char(27) || a:key == 'q'
+    elseif a:key == nr2char(27) || a:key == 'q' " <Esc> or q
       call self._quit()
       return 1
     elseif a:key == "\r" || a:key == "\n"
@@ -73,19 +75,16 @@ function! w#menu_controller#new()
     let self._selected_index = -1
   endfunction "}}}
 
-
   function! self.echo_prompt() " {{{
     echo '=== Please select (j/k/enter/esc/q) =========='
     for i in range(0, len(self.menu) - 1)
       if i == self._selected_index
-        echo "> " . self.menu[i]
+        echo "> " . self.menu[i].text
       else
-        echo "  " . self.menu[i]
+        echo "  " . self.menu[i].text
       endif
     endfor
   endfunction " }}}
-
-
 
   return self
 

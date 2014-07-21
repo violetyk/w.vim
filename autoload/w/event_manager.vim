@@ -22,9 +22,14 @@ function! w#event_manager#new()
       return
     endif
 
+    if a:0 > 0
+      let context = [a:1]
+    else
+      let context = [{}]
+    endif
     for Listener in self._events[a:name]
       if type(Listener) == type(function('type'))
-        call call(Listener, a:000, self._events)
+        call call(Listener, context, self._events)
       endif
     endfor
   endfunction "}}}
