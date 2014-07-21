@@ -139,14 +139,15 @@ function! w#sidebar_controller#new()
 
     try
       call setqflist([], ' ')
-      execute printf('silent vimgrep /%s/jg %s', word, g:w#settings.note_dir() . '*')
+      execute printf('silent vimgrep /%s/j %s', word, g:w#settings.note_dir() . '**/*')
       execute self.winnr() . 'wincmd w'
 
       let note_dir = g:w#settings.note_dir()
 
       for d in getqflist()
-        let f = bufname(d.bufnr)
+        let f = fnamemodify(bufname(d.bufnr),':p')
         let path = fnamemodify(f, ':s?' . note_dir . '??')
+
         let notes = w#database#find_notes({'path': path, 'limit': 1})
         if has_key(notes[0], 'title')
           call self.draw_line(self.indent(

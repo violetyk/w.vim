@@ -25,8 +25,8 @@ function! w#bootstrap() "{{{
   " register auto commands
   augroup w_vim_note
     autocmd!
-    autocmd BufRead *
-          \ if w#in_note_dir(expand("%:p"))| call w#read_note(expand("%:p")) | endif
+    autocmd BufEnter *
+          \ if w#buffer#is_window_usable(winnr()) && w#in_note_dir(expand("%:p"))| call w#read_note(expand("%:p")) | endif
     autocmd BufWritePost *
           \ if w#in_note_dir(expand("%:p"))| call w#write_note(expand("%:p")) | endif
   augroup END
