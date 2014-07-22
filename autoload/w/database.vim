@@ -7,6 +7,7 @@ let s:V       = vital#of(g:w_of_vital)
 let s:Message = s:V.import('Vim.Message')
 let s:File    = s:V.import('System.File')
 let s:DB      = s:V.import('Database.SQLite')
+let s:JSON    = s:V.import('Web.JSON')
 
 let s:version = 1
 
@@ -182,6 +183,45 @@ endfunction "}}}
 
 function! w#database#modify_path(path) "{{{
   return fnamemodify(a:path, ':s?' . g:w#settings.note_dir() . '??')
+endfunction "}}}
+
+function! w#database#get_note_context(path, key) "{{{
+  let path = w#database#modify_path(a:path)
+  let result = w#database#query("SELECT context FROM notes WHERE path = ?;\n", [path])
+  if !empty(result) && has_key(result[0], 'context') && result[0].context != ''
+    let context = {}
+    try
+      let context = s:JSON.decode(result[0].context)
+    catch
+    endtry
+
+    return get(context, a:key, '')
+  endif
+
+  return ''
+endfunction "}}}
+
+function! w#database#set_note_context(path, key, value) "{{{
+  let path = w#database#modify_path(a:path)
+  let result = w#database#query("SELECT context FROM notes WHERE path = ?;\n", [path])
+
+  if !empty(result) && has_key(result[0], 'context')
+    let context = {}
+    try
+      let context = s:JSON.decode(result[0].context)
+    catch
+    endtry
+
+    let context[a:key] = a:value
+    try
+      let sql = "UPDATE notes SET context = ?, modified = DATETIME('now','localtime') WHERE path = ?;\n"
+      call w#database#query(sql, [s:JSON.encode(context), path])
+      return 1
+    catch
+    endtry
+  endif
+
+  return 0
 endfunction "}}}
 
 let &cpo = s:save_cpo

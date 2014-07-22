@@ -4,6 +4,14 @@ set cpo&vim
 let s:feature = {
       \ 'name': 'sample',
       \ 'event': {},
+      \ 'menu': {
+      \   'set_note_data': {
+      \     'text': 'Set data of note'
+      \   },
+      \   'get_note_data': {
+      \     'text': 'Get data of note'
+      \   },
+      \ },
       \}
 
 function! s:feature.event.bootstrap(context) "{{{
@@ -33,6 +41,20 @@ endfunction "}}}
 function! s:feature.event.note_after_delete(context) "{{{
   echo "[feature:sample] After delete! " . a:context.filepath
 endfunction "}}}
+
+function! s:feature.menu.set_note_data.callback(context) " {{{
+  let data = input('Set data: ')
+  if w#database#set_note_context(a:context.filepath, 'sample', data)
+    echo "\nSuccess!"
+  else
+    echo "\nFailure!"
+  end
+endfunction "}}}
+
+function! s:feature.menu.get_note_data.callback(context) " {{{
+  echo w#database#get_note_context(a:context.filepath, 'sample')
+endfunction "}}}
+
 
 function! w#features#sample#load() "{{{
   return [
