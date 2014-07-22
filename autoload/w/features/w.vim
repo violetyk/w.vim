@@ -13,7 +13,6 @@ let s:feature = {
       \}
 
 function! s:feature.menu.delete_note.callback(context) " {{{
-
   let choice = confirm("Are you sure you want to delete?\n" . a:context.filepath, "&Yes\n&No", 2)
   if choice == 1 " Yes
     call w#delete_note(a:context.filepath)

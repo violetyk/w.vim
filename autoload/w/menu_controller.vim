@@ -33,10 +33,12 @@ function! w#menu_controller#new(context, menu)
       redraw!
     endtry
 
-    let selected = get(self.menu, self._selected_index, {})
-    if !empty(selected)
-      let Fnction = selected.callback
-      call call(Fnction, [self.context], selected)
+    if self._selected_index >= 0
+      let selected = get(self.menu, self._selected_index, {})
+      if !empty(selected)
+        let Fnction = selected.callback
+        call call(Fnction, [self.context], selected)
+      endif
     endif
   endfunction "}}}
 
