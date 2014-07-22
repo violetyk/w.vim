@@ -57,23 +57,24 @@ function! w#database#loadfile(path) "{{{
 endfunction "}}}
 
 function! w#database#save_note(path, title, new_tags, old_tags) "{{{
+  let path = w#database#modify_path(a:path)
   let sql = "BEGIN;\n"
   let params = []
 
   " UPSERT note
   let sql .= "INSERT OR IGNORE INTO notes(path, title) VALUES(?, ?);\n"
-  call add(params, a:path)
+  call add(params, path)
   call add(params, a:title)
   let sql .= "UPDATE notes SET title = ?, modified = DATETIME('now','localtime') WHERE path = ?;\n"
   call add(params, a:title)
-  call add(params, a:path)
+  call add(params, path)
 
 
   " UPSERT search_data
   let sql .= "DELETE FROM search_data WHERE note_path = ?;\n"
-  call add(params, a:path)
+  call add(params, path)
   let sql .= "INSERT INTO search_data(note_path, tags) VALUES(?, ?);\n"
-  call add(params, a:path)
+  call add(params, path)
   call add(params, join(a:new_tags))
 
   " UPDATE tags
@@ -93,14 +94,46 @@ function! w#database#save_note(path, title, new_tags, old_tags) "{{{
     call w#database#query(sql, params)
     return 1
   catch
+    call w#database#query('ROLLBACK;')
     return 0
   endtry
 endfunction "}}}
 
 function! w#database#delete_note(path) "{{{
+  let path = w#database#modify_path(a:path)
 
-  return 1
+  let sql = "BEGIN;\n"
+  let params = []
 
+  " get tags
+  let result = w#database#query("SELECT tags FROM search_data WHERE note_path = ?;\n", [path])
+  let tags = []
+  if !empty(result) && has_key(result[0], 'tags') && result[0].tags != ''
+    let tags = split(result[0].tags)
+  endif
+
+  let sql .= "DELETE FROM search_data WHERE note_path = ?;\n"
+  call add(params, path)
+
+  let sql .= "DELETE FROM notes WHERE path = ?;\n"
+  call add(params, path)
+
+  " UPDATE tags
+  for tag in tags
+    let sql .= "INSERT OR REPLACE INTO tags(name, note_count) VALUES(?, (SELECT count(note_path) FROM search_data WHERE tags MATCH ?));\n"
+    call add(params, tag)
+    call add(params, tag)
+  endfor
+  let sql .= "DELETE FROM tags WHERE note_count = 0;\n"
+
+  let sql .= "COMMIT;\n"
+  try
+    call w#database#query(sql, params)
+    return 1
+  catch
+    call w#database#query('ROLLBACK;')
+    return 0
+  endtry
 endfunction "}}}
 
 function! w#database#find_notes(option) "{{{
@@ -147,6 +180,9 @@ function! w#database#find_all_tags() "{{{
   return w#database#query(sql, [])
 endfunction "}}}
 
+function! w#database#modify_path(path) "{{{
+  return fnamemodify(a:path, ':s?' . g:w#settings.note_dir() . '??')
+endfunction "}}}
 
 let &cpo = s:save_cpo
 unlet s:save_cpo

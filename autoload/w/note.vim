@@ -13,12 +13,12 @@ function! w#note#create() "{{{
 endfunction "}}}
 
 function! w#note#write(filepath, title, new_tags, old_tags) "{{{
-  let path = fnamemodify(a:filepath, ':s?' . g:w#settings.note_dir() . '??')
-  return w#database#save_note(path, a:title, a:new_tags, a:old_tags)
+  return w#database#save_note(a:filepath, a:title, a:new_tags, a:old_tags)
 endfunction "}}}
 
 function! w#note#delete(filepath) "{{{
-  return delete(a:filepath) == 0 && w#database#delete_note(a:filepath)
+  return w#database#delete_note(a:filepath) && delete(a:filepath) == 0
+  " return w#database#delete_note(a:filepath)
 endfunction "}}}
 
 

@@ -71,7 +71,6 @@ function! w#sidebar_controller#new()
     endif
   endfunction "}}}
 
-
   function! self.current_node() "{{{
     let node = {}
     let section_type = self.detect_section_type(line('.'))
